@@ -1,0 +1,15 @@
+.sidebar {
+    width: 300px;
+    padding: 20px;
+    background: #f8f9fa;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    overflow: auto;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  .sidebar h2 {
+    margin-top: 0;
+  }
+  

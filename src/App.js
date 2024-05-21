@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
+import React, { useState, useEffect } from 'react';
+import MapComponent from './MapComponent';
+import Sidebar from './Sidebar';
+
+const App = () => {
+  const [variable, setVariable] = useState('cognitiveDifficulty');
+  const [geography, setGeography] = useState('county');
+  const [geoData, setGeoData] = useState(null);
+
+  useEffect(() => {
+    const fetchGeoData = async () => {
+      try {
+        const response = await fetch('/data/puma_newengland.geojson');
+        const data = await response.json();
+        setGeoData(data);
+      } catch (error) {
+        console.error('Error loading GeoJSON data:', error);
+      }
+    };
+
+    fetchGeoData();
+  }, []);
+
+  const handleVariableChange = (e) => {
+    setVariable(e.target.value);
+  };
+
+  const handleGeographyChange = (e) => {
+    setGeography(e.target.value);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App" style={{ display: 'flex' }}>
+      <Sidebar onVariableChange={handleVariableChange} onGeographyChange={handleGeographyChange} />
+      <div style={{ flex: 1 }}>
+        {geoData ? (
+          <MapComponent geoData={geoData} variable={variable} geography={geography} />
+        ) : (
+          <div>Loading map...</div>
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
