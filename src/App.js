@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import MapComponent from './MapComponent';
 import Sidebar from './Sidebar';
+import './App.css';
 
 const App = () => {
   const [variable, setVariable] = useState('cognitiveDifficulty');
@@ -31,15 +32,9 @@ const App = () => {
   };
 
   return (
-    <div className="App" style={{ display: 'flex' }}>
+    <div className="app-container">
       <Sidebar onVariableChange={handleVariableChange} onGeographyChange={handleGeographyChange} />
-      <div style={{ flex: 1 }}>
-        {geoData ? (
-          <MapComponent geoData={geoData} variable={variable} geography={geography} />
-        ) : (
-          <div>Loading map...</div>
-        )}
-      </div>
+      <MapComponent variable={variable} geography={geography} />
     </div>
   );
 };
