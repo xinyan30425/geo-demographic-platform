@@ -8,15 +8,17 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
       <div>
         <label>Select Variable:</label>
         <select onChange={onVariableChange}>
-          <option value="cognitiveDifficulty">Cognitive Difficulty</option>
+          <option value="">Alzheimers</option>
+          <option value="">Food Insecurity</option>
           {/* Add more options here */}
         </select>
       </div>
       <div>
         <label>Select Geography:</label>
         <select onChange={onGeographyChange}>
+          <option value="county">PUMA</option>
           <option value="county">County</option>
-          {/* Add more options here */}
+          <option value="county">Tract</option>
         </select>
       </div>
       {/* Add more controls as needed */}
