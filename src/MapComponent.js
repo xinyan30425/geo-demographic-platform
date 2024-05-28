@@ -15,14 +15,16 @@ const MapComponent = ({ variable, geography }) => {
     const fetchData = async () => {
       try {
         // Fetch GeoJSON data
-        const geoJsonResponse = await fetch('/data/puma_newengland.geojson');
+        //const geoJsonResponse = await fetch('/data/puma_newengland.geojson');//puma
+        const geoJsonResponse = await fetch('/data/county_newengland.geojson')//county
         if (!geoJsonResponse.ok) throw new Error('Failed to fetch GeoJSON data');
         const geoJson = await geoJsonResponse.json();
         setGeoData(geoJson);
         // console.log('GeoJSON Data:', geoJson);
 
         // Fetch and parse CSV data
-        const csvResponse = await fetch('/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv');
+        // const csvResponse = await fetch('/data/ACS_New_England_Puma_Level_Alzheimer_Estimates_withedu.csv');//puma
+        const csvResponse = await fetch('/data/New_England_County_Level_Alzheimer_Percentage_with_County.csv');//county
         if (!csvResponse.ok) throw new Error('Failed to fetch CSV data');
         const csvText = await csvResponse.text();
         const csvData = Papa.parse(csvText, { header: true }).data;
@@ -38,7 +40,8 @@ const MapComponent = ({ variable, geography }) => {
 
         // Merge CSV data with GeoJSON data
         const mergedData = geoJson.features.map(feature => {
-          const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.GEOID10);
+          //const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.GEOID10);//puma
+          const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.GEOID);//county
           if (matchingCsvData) {
             feature.properties.percentage = matchingCsvData.percentage;
           }
