@@ -21,16 +21,24 @@ const MapComponent = () => {
   const fetchDataFromAPI = async () => {
     try {
       const query = new URLSearchParams(filters).toString();
-      const url = `https://208bddka5j.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;
+      const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
+
+      //const url = `https://208bddka5j.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//http
+
       console.log("Fetching data from:", url);
 
-      const response = await fetch(url);
-      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+        const message = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${message}`);
       }
-      
+
       const data = await response.json();
       console.log("Data fetched from API:", data);
       return data;
@@ -41,7 +49,7 @@ const MapComponent = () => {
   };
 
   const fetchGeoJSON = async () => {
-    const geoJsonResponse = await fetch('/data/puma_newengland.geojson'); // puma GeoJSON
+    const geoJsonResponse = await fetch('/data/puma_newengland.geojson'); 
     if (!geoJsonResponse.ok) throw new Error('Failed to fetch GeoJSON data');
     const geoJson = await geoJsonResponse.json();
     return geoJson;
@@ -90,7 +98,7 @@ const MapComponent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchDataFromAPI();
+    fetchAndMergeData();
   };
 
   const styleFeature = feature => {
@@ -165,7 +173,6 @@ const MapComponent = () => {
         <select name="table" onChange={handleInputChange}>
           <option value="alzheimer_data">Alzheimer Data</option>
           <option value="demographic_data">Demographic Data</option>
-          {/* Add more options as needed */}
         </select>
         <input type="text" name="geoid" placeholder="GEOID" onChange={handleInputChange} />
         <input type="text" name="sex" placeholder="Sex" onChange={handleInputChange} />
