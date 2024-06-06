@@ -21,7 +21,9 @@ const MapComponent = () => {
   const fetchDataFromAPI = async () => {
     try {
       const query = new URLSearchParams(filters).toString();
-      const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
+      //const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
+
+      const url = `/geodemo/data?${query}`;
 
       //const url = `https://208bddka5j.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//http
 
@@ -30,9 +32,10 @@ const MapComponent = () => {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
+            //'x-api-key': 'Kv8nUmrKv55mCpkRCNb3E9xq4TygMGuhabXdpDSd' // Replace with your actual API Key
         },
-      });
+    });
 
       if (!response.ok) {
         const message = await response.text();
@@ -47,6 +50,8 @@ const MapComponent = () => {
       throw error;
     }
   };
+
+ 
 
   const fetchGeoJSON = async () => {
     const geoJsonResponse = await fetch('/data/puma_newengland.geojson'); 
