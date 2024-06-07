@@ -16,7 +16,8 @@ const MapComponent = ({ variable, geography }) => {
       try {
         // Fetch GeoJSON data
         //const geoJsonResponse = await fetch('/data/puma_newengland.geojson');//puma
-        const geoJsonResponse = await fetch('/data/county_newengland.geojson')//county
+        //const geoJsonResponse = await fetch('/data/county_newengland.geojson')//county
+        const geoJsonResponse = await fetch('/data/county_maine.geojson')//county
         if (!geoJsonResponse.ok) throw new Error('Failed to fetch GeoJSON data');
         const geoJson = await geoJsonResponse.json();
         setGeoData(geoJson);
@@ -24,24 +25,33 @@ const MapComponent = ({ variable, geography }) => {
 
         // Fetch and parse CSV data
         // const csvResponse = await fetch('/data/ACS_New_England_Puma_Level_Alzheimer_Estimates_withedu.csv');//puma
-        const csvResponse = await fetch('/data/New_England_County_Level_Alzheimer_Percentage_with_County.csv');//county
+        // const csvResponse = await fetch('/data/New_England_County_Level_Alzheimer_Percentage_with_County.csv');//county
+        const csvResponse = await fetch('/data/NCHS_Maine_County_Level_Alzheimer_Estimates.csv');//county
         if (!csvResponse.ok) throw new Error('Failed to fetch CSV data');
         const csvText = await csvResponse.text();
         const csvData = Papa.parse(csvText, { header: true }).data;
         // console.log('CSV Data:', csvData);
 
         // Convert GEOID fields to strings to ensure proper matching
+        // const processedCsvData = csvData.map(row => ({
+        //   ...row,
+        //   GEOID: row.GEOID.toString(),
+        //   percentage: parseFloat(row.percentage)
+        // }));
+        // // console.log('Processed CSV Data:', processedCsvData);
+
+        // Convert GEOID fields to strings and add leading zeros to ensure proper matching
         const processedCsvData = csvData.map(row => ({
           ...row,
-          GEOID: row.GEOID.toString(),
-          percentage: parseFloat(row.percentage)
+          GEOID: row.GEOID.padStart(3, '0'), // Add leading zeros to make it 3 digits
+          percentage: parseFloat(row.percentage) // Ensure to parse the percentage correctly
         }));
-        // console.log('Processed CSV Data:', processedCsvData);
+
 
         // Merge CSV data with GeoJSON data
         const mergedData = geoJson.features.map(feature => {
           //const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.GEOID10);//puma
-          const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.GEOID);//county
+          const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.COUNTYFP);//county
           if (matchingCsvData) {
             feature.properties.percentage = matchingCsvData.percentage;
           }
@@ -172,8 +182,13 @@ const MapComponent = ({ variable, geography }) => {
             transform: 'translate(-50%, -100%)'
           }}
         >
-          <p>GEOID: {selectedFeature.GEOID10 || 'N/A'}</p>
-          <p>Alzheimer's Incidence Rate: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+          {/* <p>GEOID: {selectedFeature.GEOID10 || 'N/A'}</p> */}
+          {/* <p>GEOID: {selectedFeature.GEOID || 'N/A'}</p> */}
+          <p>{selectedFeature.NAMELSAD || 'N/A'}</p>
+          {/* <p>Alzheimer's Incidence Rate: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p> */}
+          <p>Percentage of people eat fewer high fat foods: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+          <p>Percentage of household have a 3-day supply of food: 87.1%</p>
+
         </div>
       )}
     </div>

@@ -4,7 +4,8 @@ import './Legend.css';
 const Legend = () => {
   return (
     <div className="legend">
-      <h4>Alzheimer's Incidence Rate</h4>
+      {/* <h4>Alzheimer's Incidence Rate</h4> */}
+      <h4>Percentage of Population </h4> 
       <div><i style={{ background: '#800026' }}></i> &gt; 10.5%</div>
       <div><i style={{ background: '#BD0026' }}></i> 10% - 10.5%</div>
       <div><i style={{ background: '#E31A1C' }}></i> 9.5% - 10%</div>
