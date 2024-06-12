@@ -6,16 +6,22 @@ import './App.css';
 
 const App = () => {
   const [geography, setGeography] = useState('county');
+  const [variable, setVariable] = useState('');
 
-  const handleGeographyChange = (e) => {
-    setGeography(e.target.value);
-    console.log("Geography changed to:", e.target.value);
+  const handleGeographyChange = (value) => {
+    setGeography(value);
+    console.log("Geography changed to:", value);
+  };
+
+  const handleVariableChange = (value) => {
+    setVariable(value);
+    console.log("Variable changed to:", value);
   };
 
   return (
     <div className="app-container">
-      <Sidebar onGeographyChange={handleGeographyChange} />
-      <MapComponent geography={geography} />
+      <Sidebar onGeographyChange={handleGeographyChange} onVariableChange={handleVariableChange} />
+      <MapComponent geography={geography} variable={variable} />
     </div>
   );
 };

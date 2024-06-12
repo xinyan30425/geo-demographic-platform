@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
 import Legend from './Legend';
 
-const MapComponent = ({ geography }) => {
+const MapComponent = ({ geography, variable }) => {
   const [geoData, setGeoData] = useState(null);
   const [mergedGeoData, setMergedGeoData] = useState(null);
   const [selectedFeature, setSelectedFeature] = useState(null);
@@ -13,7 +13,7 @@ const MapComponent = ({ geography }) => {
   const [showCursor, setShowCursor] = useState(false);
 
   useEffect(() => {
-    console.log("Fetching data for geography:", geography);
+    console.log("Fetching data for geography:", geography, "and variable:", variable);
 
     const fetchData = async () => {
       try {
@@ -22,13 +22,17 @@ const MapComponent = ({ geography }) => {
 
         if (geography === 'puma') {
           geoJsonPath = '/data/puma_maine.geojson';
-          csvPath = '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv';
+          csvPath = variable === 'Dhanawithedu' 
+            ? '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv' 
+            : '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withoutedu.csv';
         } else if (geography === 'county') {
           geoJsonPath = '/data/modified_county_maine.geojson';
-          csvPath = '/data/NCHS_Maine_County_Level_Alzheimer_Estimates.csv';
+          csvPath = '/data/NCHS_Maine_County_Level_Alzheimer_Estimates.csv';  // Assuming same file for county
         } else if (geography === 'tract') {
           geoJsonPath = '/data/tract_maine.geojson';
-          csvPath = '/data/tract_maine_alzheimer_probabilities_withoutedu.csv';
+          csvPath = variable === 'Dhanawithedu' 
+            ? '/data/tract_maine_alzheimer_probabilities_withedu.csv' 
+            : '/data/tract_maine_alzheimer_probabilities_withoutedu.csv';
         }
 
         console.log(`GeoJSON Path: ${geoJsonPath}, CSV Path: ${csvPath}`);
@@ -77,7 +81,7 @@ const MapComponent = ({ geography }) => {
     };
 
     fetchData();
-  }, [geography]);// Re-run the effect when geography changes
+  }, [geography, variable]); // Re-run the effect when geography or variable changes
 
   const styleFeature = feature => ({
     fillColor: getColor(feature.properties.percentage),
@@ -91,11 +95,12 @@ const MapComponent = ({ geography }) => {
   const getColor = d => {
     return d > 10.5 ? '#800026' :
       d > 10 ? '#BD0026' :
-      d > 9.5 ? '#E31A1C' :
-      d > 9 ? '#FC4E2A' :
-      d > 8.5 ? '#FD8D3C' :
+      d > 9 ? '#E31A1C' :
+      d > 8 ? '#FC4E2A' :
+      d > 7 ? '#FD8D3C' :
       d > 6 ? '#FEB24C' :
-      '#FFEDA0';
+      d > 5 ?'#FFEDA0':
+      '#FFFAF0'; 
   };
 
   const onEachFeature = (feature, layer) => {
@@ -120,7 +125,6 @@ const MapComponent = ({ geography }) => {
         if (panelY + panelHeight > containerHeight) {
           panelY = containerHeight - panelHeight;
         }
-
         if (panelX < 0) {
           panelX = 0;
         }
@@ -157,8 +161,7 @@ const MapComponent = ({ geography }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {/* Use a unique key for GeoJSON to force re-render */}
-        <GeoJSON key={`${geography}-${Date.now()}`} data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
+        <GeoJSON key={`${geography}-${variable}-${Date.now()}`} data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
         <Legend />
       </MapContainer>
 
@@ -192,7 +195,7 @@ const MapComponent = ({ geography }) => {
           {geography === 'puma' && (
             <>
               <p>{selectedFeature.NAMELSAD10 || 'N/A'}</p>
-              <p>Alzheimers Incidence Rate by Puma: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+              <p>Alzheimers Incidence Rate by PUMA: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
           {geography === 'county' && (
@@ -207,7 +210,6 @@ const MapComponent = ({ geography }) => {
               <p>Alzheimers Incidence Rate by Tract: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
-          
         </div>
       )}
     </div>
@@ -223,23 +225,18 @@ const processPumaCsvData = (csvData) => {
   })).filter(row => row.GEOID && row.percentage !== null);
 };
 
-// Functions to merge CSV data with GeoJSON data
-const mergePumaData = (geoJson, csvData) => {
-  return geoJson.features.map(feature => {
-    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.GEOID10);
-
-    if (matchingCsvData) {
-      console.log('PUMA Match:', matchingCsvData, feature);
-      feature.properties.percentage = matchingCsvData.percentage;
-    }
-    return feature;
-  });
+const processCountyCsvData = (csvData) => {
+  return csvData.map(row => ({
+    ...row,
+    GEOID: row.GEOID,
+    percentage: row.percentage ? parseFloat(row.percentage) : null
+  })).filter(row => row.GEOID && row.percentage !== null);
 };
 
 const processTractCsvData = (csvData) => {
   return csvData.map(row => ({
     ...row,
-    county: row.county,
+    county: row.county1,
     tracta: row.tracta,
     percentage: row.percentage ? parseFloat(row.percentage) : null
   })).filter(row => row.county && row.tracta && row.percentage !== null);
@@ -254,26 +251,18 @@ const cleanTractGeoJson = (geoJson) => {
   return geoJson;
 };
 
-const mergeTractData = (geoJson, csvData) => {
+// Functions to merge CSV data with GeoJSON data
+const mergePumaData = (geoJson, csvData) => {
   return geoJson.features.map(feature => {
-    const matchingCsvData = csvData.find(row => row.county1 === feature.properties.COUNTYFP && row.tracta === feature.properties.TRACTCE);
+    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.GEOID10);
 
     if (matchingCsvData) {
-      console.log('Tract Match:', matchingCsvData, feature);
+      console.log('PUMA Match:', matchingCsvData, feature);
       feature.properties.percentage = matchingCsvData.percentage;
     }
     return feature;
   });
 };
-
-const processCountyCsvData = (csvData) => {
-  return csvData.map(row => ({
-    ...row,
-    GEOID: row.GEOID,
-    percentage: row.percentage ? parseFloat(row.percentage) : null
-  })).filter(row => row.GEOID && row.percentage !== null);
-};
-
 
 const mergeCountyData = (geoJson, csvData) => {
   return geoJson.features.map(feature => {
@@ -287,5 +276,17 @@ const mergeCountyData = (geoJson, csvData) => {
   });
 };
 
+const mergeTractData = (geoJson, csvData) => {
+  return geoJson.features.map(feature => {
+    const matchingCsvData = csvData.find(row => row.county === feature.properties.COUNTYFP && row.tracta === feature.properties.TRACTCE);
+
+    if (matchingCsvData) {
+      console.log('Tract Match:', matchingCsvData, feature);
+      feature.properties.percentage = matchingCsvData.percentage;
+    }
+    return feature;
+  });
+};
 
 export default MapComponent;
+

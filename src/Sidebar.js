@@ -1,11 +1,7 @@
-// Sidebar.js
-import React from 'react';
-import { Select, MenuItem, FormControl, InputLabel, Typography, Box, TextField, InputAdornment, Divider } from '@mui/material';
+import React, { useState } from 'react';
+import { MenuItem, FormControl, InputLabel, Typography, Box, Select, InputAdornment, Divider } from '@mui/material';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import PublicIcon from '@mui/icons-material/Public';
-import WcIcon from '@mui/icons-material/Wc';
-import PeopleIcon from '@mui/icons-material/People';
-import CakeIcon from '@mui/icons-material/Cake';
 import SchoolIcon from '@mui/icons-material/School';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -25,7 +21,20 @@ const theme = createTheme({
   },
 });
 
-const Sidebar = ({onGeographyChange }) => {
+const Sidebar = ({ onGeographyChange, onVariableChange }) => {
+  const [selectedEstimate, setSelectedEstimate] = useState('');
+  const [selectedGeography, setSelectedGeography] = useState('county');
+
+  const handleVariableChange = (event) => {
+    setSelectedEstimate(event.target.value);
+    onVariableChange(event.target.value);
+  };
+
+  const handleGeographyChange = (event) => {
+    setSelectedGeography(event.target.value);
+    onGeographyChange(event.target.value);
+  };
+
   const dropdownStyle = {
     fontSize: '14px',
     padding: '0px',
@@ -56,55 +65,79 @@ const Sidebar = ({onGeographyChange }) => {
     marginRight: '8px',
   };
 
-  const textFieldStyle = {
-    '.MuiInputBase-root': {
-      paddingLeft: '50px',
-      fontSize: '12px',
-      width: '100%',
-      height: '40px',
-      transition: 'background-color 0.3s ease',
-    },
-    '.MuiInputAdornment-root': {
-      position: 'absolute',
-      left: '10px',
-    },
+  const selectFieldStyle = {
     width: '100%',
+    height: '40px',
+    fontSize: '14px',
   };
 
   return (
     <ThemeProvider theme={theme}>
-    <Box sx={{ width: 300, padding: 3, background: 'linear-gradient(135deg, #4f4f4f, #666666)', borderRadius: 0, boxShadow: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Select desired options to populate dashboard
-      </Typography>
+      <Box sx={{ width: 300, padding: 3, background: 'linear-gradient(135deg, #4f4f4f, #666666)', borderRadius: 0, boxShadow: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Select desired options to populate dashboard
+        </Typography>
 
-      <Divider sx={{ marginBottom: 2, backgroundColor: '#F4A460' }} />
+        <Divider sx={{ marginBottom: 2, backgroundColor: '#F4A460' }} />
 
-      <Box sx={{ marginBottom: 2 }}>
-        <Typography>Select Geography</Typography>
-        <TextField
-          select
-          onChange={onGeographyChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <PublicIcon />
-              </InputAdornment>
-            ),
-          }}
-          defaultValue="county"
-        >
-          <MenuItem value="puma">PUMA</MenuItem>
-          <MenuItem value="county">County</MenuItem>
-          <MenuItem value="tract">Tract</MenuItem>
-        </TextField>
+        <Box sx={{ marginBottom: 2 }}>
+          <Typography sx={labelStyle}>Select Estimates</Typography>
+          <FormControl fullWidth>
+            <Select
+              value={selectedEstimate}
+              onChange={handleVariableChange}
+              startAdornment={
+                <InputAdornment position="start">
+                  <SchoolIcon sx={iconStyle} />
+                </InputAdornment>
+              }
+              sx={selectFieldStyle}
+            >
+              <MenuItem value="Dhanawithedu">Dhana ADRD model with education</MenuItem>
+              <MenuItem value="Dhanawithoutedu">Dhana ADRD model without education</MenuItem>
+              <MenuItem value="DirectEstimates">MaineCDC BRFSS Cognitive decline Direct estimates</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        <Box sx={{ marginBottom: 2 }}>
+          <Typography>Select Geography</Typography>
+          <FormControl fullWidth>
+            <Select
+              value={selectedGeography}
+              onChange={handleGeographyChange}
+              startAdornment={
+                <InputAdornment position="start">
+                  <PublicIcon />
+                </InputAdornment>
+              }
+              sx={selectFieldStyle}
+            >
+              {selectedEstimate === 'DirectEstimates' ? (
+                [
+                  <MenuItem key="city" value="city">City</MenuItem>,
+                  <MenuItem key="zipcode" value="zipcode">Zipcode</MenuItem>,
+                  <MenuItem key="county" value="county">County</MenuItem>,
+                  <MenuItem key="district" value="district">District</MenuItem>,
+                  <MenuItem key="urbanRural" value="urbanRural">Urban Rural</MenuItem>
+                ]
+              ) : (
+                [
+                  <MenuItem key="puma" value="puma">PUMA</MenuItem>,
+                  <MenuItem key="county" value="county">County</MenuItem>,
+                  <MenuItem key="tract" value="tract">Tract</MenuItem>
+                ]
+              )}
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
-    </Box>
-  </ThemeProvider>
+    </ThemeProvider>
   );
 };
 
 export default Sidebar;
+
 
 
 {/* <Box sx={{ marginBottom: 2 }}>
