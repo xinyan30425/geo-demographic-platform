@@ -1,11 +1,11 @@
-GEOID,affected_population,total_population,percentage,
-2300100,2815.00104,26301,10.7,
-2300200,3268.103085,35764,9.1,
-2300300,2718.039768,28160,9.7,
-2300400,2342.501147,25477,9.2,
-2300500,3691.45637,44540,8.3,
-2300600,2047.150348,20551,10.0,
-2300700,1931.392118,23885,8.1,
-2300800,3500.404145,40470,8.6,8.882914545
-2300900,2441.191987,27741,8.8,
-2301000,1929.199131,20395,9.5,
+GEOID,affected_population,total_population,percentage,county
+2300100,2815.00104,26301,10.7,Northeast Maine--Aroostook & Washington
+2300200,3268.103085,35764,9.1,"Northwest Maine--Oxford, Somerset, Franklin & Piscataquis"
+2300300,2718.039768,28160,9.7,Penobscot
+2300400,2342.501147,25477,9.2,Kennebec
+2300500,3691.45637,44540,8.3,"Coastal Maine Region--Hancock, Knox, Waldo & Lincoln"
+2300600,2047.150348,20551,10,Androscoggin
+2300700,1931.392118,23885,8.1,Sagadahoc & Cumberland (North) Counties--Bath City & Brunswick
+2300800,3500.404145,40470,8.6,South Maine--York (West) & Cumberland (West)
+2300900,2441.191987,27741,8.8,Cumberland (Outside Portland) & York (East) Counties--Biddeford & Saco Cities
+2301000,1929.199131,20395,9.5,"Cumberland County (Southeast)--Portland, South Portland & Westbrook Cities"

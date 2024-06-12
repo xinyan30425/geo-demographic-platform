@@ -1,5 +1,6 @@
+// Sidebar.js
 import React from 'react';
-import { Select, MenuItem, FormControl, InputLabel, Typography, Box, TextField, InputAdornment } from '@mui/material';
+import { Select, MenuItem, FormControl, InputLabel, Typography, Box, TextField, InputAdornment, Divider } from '@mui/material';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import PublicIcon from '@mui/icons-material/Public';
 import WcIcon from '@mui/icons-material/Wc';
@@ -8,19 +9,23 @@ import CakeIcon from '@mui/icons-material/Cake';
 import SchoolIcon from '@mui/icons-material/School';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// Create a custom theme
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#F4A460', // Darker apricot color
+      main: '#F4A460',
     },
   },
   typography: {
     fontFamily: 'Arial, sans-serif',
+    h5: {
+      fontFamily: 'Georgia, serif',
+      fontWeight: 'bold',
+      color: '#F4A460',
+    },
   },
 });
 
-const Sidebar = ({ onVariableChange, onGeographyChange }) => {
+const Sidebar = ({onGeographyChange }) => {
   const dropdownStyle = {
     fontSize: '14px',
     padding: '0px',
@@ -35,15 +40,16 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
   const labelStyle = {
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#F4A460', // Darker apricot color
+    color: '#F4A460',
     marginBottom: '5px',
   };
 
   const typographyStyle = {
     fontSize: '18px',
     fontWeight: 'bold',
-    color: '#F4A460', // Darker apricot color
+    color: '#F4A460',
     marginBottom: '20px',
+    fontFamily: 'Georgia, serif',
   };
 
   const iconStyle = {
@@ -55,7 +61,7 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
       paddingLeft: '50px',
       fontSize: '12px',
       width: '100%',
-      height: '40px', // Set a fixed height for the TextField
+      height: '40px',
       transition: 'background-color 0.3s ease',
     },
     '.MuiInputAdornment-root': {
@@ -67,12 +73,65 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: 300, padding: 3, background: 'linear-gradient(135deg, #4f4f4f, #666666)', borderRadius: 0, boxShadow: 3 }}>
-        <Typography sx={typographyStyle} gutterBottom>
-          Select desired options to populate dashboard
-        </Typography>
+    <Box sx={{ width: 300, padding: 3, background: 'linear-gradient(135deg, #4f4f4f, #666666)', borderRadius: 0, boxShadow: 3 }}>
+      <Typography variant="h5" gutterBottom>
+        Select desired options to populate dashboard
+      </Typography>
 
-        <Box sx={{ marginBottom: 2 }}>
+      <Divider sx={{ marginBottom: 2, backgroundColor: '#F4A460' }} />
+
+      <Box sx={{ marginBottom: 2 }}>
+        <Typography>Select Geography</Typography>
+        <TextField
+          select
+          onChange={onGeographyChange}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <PublicIcon />
+              </InputAdornment>
+            ),
+          }}
+          defaultValue="county"
+        >
+          <MenuItem value="puma">PUMA</MenuItem>
+          <MenuItem value="county">County</MenuItem>
+          <MenuItem value="tract">Tract</MenuItem>
+        </TextField>
+      </Box>
+    </Box>
+  </ThemeProvider>
+  );
+};
+
+export default Sidebar;
+
+
+{/* <Box sx={{ marginBottom: 2 }}>
+          <Typography sx={labelStyle}>Select School Type</Typography>
+          <TextField
+            select
+            SelectProps={{
+              onChange: onVariableChange,
+              sx: dropdownStyle,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SchoolIcon sx={iconStyle} />
+                </InputAdornment>
+              ),
+            }}
+            sx={textFieldStyle}
+            defaultValue=""
+          >
+            <MenuItem value="elementary">Elementary</MenuItem>
+            <MenuItem value="middleSchool">Middle School</MenuItem>
+            <MenuItem value="highSchool">High School</MenuItem>
+          </TextField>
+        </Box> */}
+
+        {/* <Box sx={{ marginBottom: 2 }}>
           <Typography sx={labelStyle}>Select MIYHS Topic Area</Typography>
           <TextField
             select
@@ -95,33 +154,9 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
             <MenuItem value="highFatFood">Have High Fat Food</MenuItem>
             <MenuItem value="mentalHealth">Mental Health</MenuItem>
           </TextField>
-        </Box>
-        
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select Geography</Typography>
-          <TextField
-            select
-            SelectProps={{
-              onChange: onGeographyChange,
-              sx: dropdownStyle,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PublicIcon sx={iconStyle} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyle}
-            defaultValue=""
-          >
-            <MenuItem value="puma">PUMA</MenuItem>
-            <MenuItem value="county">County</MenuItem>
-            <MenuItem value="tract">Tract</MenuItem>
-          </TextField>
-        </Box>
+        </Box> */}
 
-        <Box sx={{ marginBottom: 2 }}>
+                {/* <Box sx={{ marginBottom: 2 }}>
           <Typography sx={labelStyle}>Select Gender</Typography>
           <TextField
             select
@@ -142,9 +177,9 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
             <MenuItem value="female">Female</MenuItem>
             <MenuItem value="male">Male</MenuItem>
           </TextField>
-        </Box>
+        </Box> */}
 
-        <Box sx={{ marginBottom: 2 }}>
+        {/* <Box sx={{ marginBottom: 2 }}>
           <Typography sx={labelStyle}>Select Race</Typography>
           <TextField
             select
@@ -169,10 +204,10 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
             <MenuItem value="americanIndian">American Indian</MenuItem>
             <MenuItem value="other">Other</MenuItem>
           </TextField>
-        </Box>
+        </Box> */}
 
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select Age Group</Typography>
+        {/* <Box sx={{ marginBottom: 2 }}>
+          <Typography sx={labelStyle}>Select Grade</Typography>
           <TextField
             select
             SelectProps={{
@@ -189,40 +224,11 @@ const Sidebar = ({ onVariableChange, onGeographyChange }) => {
             sx={textFieldStyle}
             defaultValue=""
           >
-            <MenuItem value="0-4">0-4</MenuItem>
-            <MenuItem value="5-9">5-9</MenuItem>
-            <MenuItem value="10-14">10-14</MenuItem>
-            <MenuItem value="15-19">15-19</MenuItem>
-            <MenuItem value="20-25">20-25</MenuItem>
+            <MenuItem value="0-4">1-2</MenuItem>
+            <MenuItem value="5-9">3-4</MenuItem>
+            <MenuItem value="10-14">5-6</MenuItem>
+            <MenuItem value="15-19">7-8</MenuItem>
+            <MenuItem value="20-25">9-10</MenuItem>
+            <MenuItem value="20-25">11-12</MenuItem>
           </TextField>
-        </Box>
-
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select Education Attainment</Typography>
-          <TextField
-            select
-            SelectProps={{
-              onChange: onVariableChange,
-              sx: dropdownStyle,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SchoolIcon sx={iconStyle} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyle}
-            defaultValue=""
-          >
-            <MenuItem value="elementary">Elementary</MenuItem>
-            <MenuItem value="middleSchool">Middle School</MenuItem>
-            <MenuItem value="highSchool">High School</MenuItem>
-          </TextField>
-        </Box>
-      </Box>
-    </ThemeProvider>
-  );
-};
-
-export default Sidebar;
+        </Box> */}

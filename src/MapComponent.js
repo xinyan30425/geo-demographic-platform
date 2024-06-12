@@ -5,119 +5,108 @@ import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
 import Legend from './Legend';
 
-const MapComponent = ({ variable, geography }) => {
+const MapComponent = ({ geography }) => {
   const [geoData, setGeoData] = useState(null);
   const [mergedGeoData, setMergedGeoData] = useState(null);
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [showCursor, setShowCursor] = useState(false);
 
   useEffect(() => {
+    console.log("Fetching data for geography:", geography);
+
     const fetchData = async () => {
       try {
-        // Fetch GeoJSON data
-        //const geoJsonResponse = await fetch('/data/puma_newengland.geojson');//puma
-        //const geoJsonResponse = await fetch('/data/county_newengland.geojson')//county
-        const geoJsonResponse = await fetch('/data/county_maine.geojson')//county
-        if (!geoJsonResponse.ok) throw new Error('Failed to fetch GeoJSON data');
-        const geoJson = await geoJsonResponse.json();
-        setGeoData(geoJson);
-        // console.log('GeoJSON Data:', geoJson);
+        let geoJsonPath, csvPath, processedCsvData, mergedData;
+        let geoJson;
 
-        // Fetch and parse CSV data
-        // const csvResponse = await fetch('/data/ACS_New_England_Puma_Level_Alzheimer_Estimates_withedu.csv');//puma
-        // const csvResponse = await fetch('/data/New_England_County_Level_Alzheimer_Percentage_with_County.csv');//county
-        const csvResponse = await fetch('/data/NCHS_Maine_County_Level_Alzheimer_Estimates.csv');//county
-        if (!csvResponse.ok) throw new Error('Failed to fetch CSV data');
+        if (geography === 'puma') {
+          geoJsonPath = '/data/puma_maine.geojson';
+          csvPath = '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv';
+        } else if (geography === 'county') {
+          geoJsonPath = '/data/modified_county_maine.geojson';
+          csvPath = '/data/NCHS_Maine_County_Level_Alzheimer_Estimates.csv';
+        }
+
+        console.log(`GeoJSON Path: ${geoJsonPath}, CSV Path: ${csvPath}`);
+
+        const [geoJsonResponse, csvResponse] = await Promise.all([
+          fetch(geoJsonPath),
+          fetch(csvPath)
+        ]);
+
+        if (!geoJsonResponse.ok) {
+          throw new Error(`Failed to fetch GeoJSON data from ${geoJsonPath}`);
+        }
+
+        if (!csvResponse.ok) {
+          throw new Error(`Failed to fetch CSV data from ${csvPath}`);
+        }
+
+        geoJson = await geoJsonResponse.json();
         const csvText = await csvResponse.text();
         const csvData = Papa.parse(csvText, { header: true }).data;
-        // console.log('CSV Data:', csvData);
 
-        // Convert GEOID fields to strings to ensure proper matching
-        // const processedCsvData = csvData.map(row => ({
-        //   ...row,
-        //   GEOID: row.GEOID.toString(),
-        //   percentage: parseFloat(row.percentage)
-        // }));
-        // // console.log('Processed CSV Data:', processedCsvData);
+        console.log(`${geography.toUpperCase()} CSV Data:`, csvData);
 
-        // Convert GEOID fields to strings and add leading zeros to ensure proper matching
-        const processedCsvData = csvData.map(row => ({
-          ...row,
-          GEOID: row.GEOID.padStart(3, '0'), // Add leading zeros to make it 3 digits
-          percentage: parseFloat(row.percentage) // Ensure to parse the percentage correctly
-        }));
+        if (geography === 'puma') {
+          processedCsvData = processPumaCsvData(csvData);
+          mergedData = mergePumaData(geoJson, processedCsvData);
+        } else if (geography === 'county') {
+          processedCsvData = processCountyCsvData(csvData);
+          mergedData = mergeCountyData(geoJson, processedCsvData);
+        }
 
+        console.log(`Processed ${geography.toUpperCase()} CSV Data:`, processedCsvData);
+        console.log(`Merged ${geography.toUpperCase()} Data:`, mergedData);
 
-        // Merge CSV data with GeoJSON data
-        const mergedData = geoJson.features.map(feature => {
-          //const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.GEOID10);//puma
-          const matchingCsvData = processedCsvData.find(row => row.GEOID === feature.properties.COUNTYFP);//county
-          if (matchingCsvData) {
-            feature.properties.percentage = matchingCsvData.percentage;
-          }
-          return feature;
-        });
-
+        setGeoData(geoJson);
         setMergedGeoData({ ...geoJson, features: mergedData });
-        // console.log('Merged GeoData:', mergedData);
+        setSelectedFeature(null); // Reset the selected feature
+        setShowCursor(false);  // Hide the cursor info panel
       } catch (error) {
         console.error('Error loading data:', error);
       }
     };
 
     fetchData();
-  }, [variable, geography]);
+  }, [geography]);// Re-run the effect when geography changes
 
-
-  useEffect(() => {
-    console.log("cursorPosition.x", cursorPosition.x);
-    console.log("cursorPosition.y", cursorPosition.y);
-  }, [cursorPosition]);
-
-
-  const styleFeature = feature => {
-    return {
-      fillColor: getColor(feature.properties.percentage),
-      weight: 2,
-      opacity: 1,
-      color: 'white',
-      dashArray: '3',
-      fillOpacity: 0.7
-    };
-  };
+  const styleFeature = feature => ({
+    fillColor: getColor(feature.properties.percentage),
+    weight: 2,
+    opacity: 1,
+    color: 'white',
+    dashArray: '3',
+    fillOpacity: 0.7
+  });
 
   const getColor = d => {
     return d > 10.5 ? '#800026' :
       d > 10 ? '#BD0026' :
-        d > 9.5 ? '#E31A1C' :
-          d > 9 ? '#FC4E2A' :
-            d > 8.5 ? '#FD8D3C' :
-              d > 8 ? '#FEB24C' :
-                '#FFEDA0';
+      d > 9.5 ? '#E31A1C' :
+      d > 9 ? '#FC4E2A' :
+      d > 8.5 ? '#FD8D3C' :
+      d > 8 ? '#FEB24C' :
+      '#FFEDA0';
   };
 
   const onEachFeature = (feature, layer) => {
     layer.on({
-      click: (e) => {
-        // const clickX = e.originalEvent.pageX;
-        // const clickY = e.originalEvent.pageY;
+      click: e => {
         const map = e.target._map;
         const { lat, lng } = e.latlng;
         const point = map.latLngToContainerPoint([lat, lng]);
-        const panelWidth = 100; // Width of the info panel
-        const panelHeight = 100; // Height of the info panel
+        const panelWidth = 100;
+        const panelHeight = 100;
 
-        // Calculate the position of the info panel
         let panelX = point.x;
         let panelY = point.y;
 
-
-        // Get container dimensions
         const container = map.getContainer();
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
 
-        // Adjust position to prevent overflow
         if (panelX + panelWidth > containerWidth) {
           panelX = containerWidth - panelWidth;
         }
@@ -125,7 +114,6 @@ const MapComponent = ({ variable, geography }) => {
           panelY = containerHeight - panelHeight;
         }
 
-        // Ensure the panel doesn't go off the screen
         if (panelX < 0) {
           panelX = 0;
         }
@@ -134,8 +122,7 @@ const MapComponent = ({ variable, geography }) => {
         }
 
         setCursorPosition({ x: panelX, y: panelY });
-        console.log("panelX", panelX);
-        console.log("panelY", panelY);
+        setShowCursor(true);
         setSelectedFeature(feature.properties);
       }
     });
@@ -145,14 +132,9 @@ const MapComponent = ({ variable, geography }) => {
     return <div>Loading...</div>;
   }
 
-  // Define the bounds for the US area
-  // const bounds = [
-  //   [24.396308, -125.0], // Southwest corner of the US
-  //   [49.384358, -66.93457] // Northeast corner of the US
-  // ];
   const bounds = [
-    [15.0, -130.0], // Southwest corner
-    [55.0, -60.0]   // Northeast corner
+    [15.0, -130.0],
+    [55.0, -60.0]
   ];
 
   return (
@@ -168,9 +150,27 @@ const MapComponent = ({ variable, geography }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <GeoJSON data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
+        {/* Use a unique key for GeoJSON to force re-render */}
+        <GeoJSON key={`${geography}-${Date.now()}`} data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
         <Legend />
       </MapContainer>
+
+      {showCursor && (
+        <div
+          className="custom-cursor"
+          style={{
+            top: cursorPosition.y,
+            left: cursorPosition.x,
+            position: 'absolute',
+            width: '20px',
+            height: '20px',
+            backgroundColor: '#F4A460',
+            borderRadius: '50%',
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {selectedFeature && (
         <div
@@ -182,17 +182,64 @@ const MapComponent = ({ variable, geography }) => {
             transform: 'translate(-50%, -100%)'
           }}
         >
-          {/* <p>GEOID: {selectedFeature.GEOID10 || 'N/A'}</p> */}
-          {/* <p>GEOID: {selectedFeature.GEOID || 'N/A'}</p> */}
-          <p>{selectedFeature.NAMELSAD || 'N/A'}</p>
-          {/* <p>Alzheimer's Incidence Rate: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p> */}
-          <p>Percentage of people eat fewer high fat foods: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
-          <p>Percentage of household have a 3-day supply of food: 87.1%</p>
-
+          {geography === 'puma' && (
+            <>
+              <p>{selectedFeature.NAMELSAD10 || 'N/A'}</p>
+              <p>Alzheimers Incidence Rate by Puma: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+            </>
+          )}
+          {geography === 'county' && (
+            <>
+              <p>{selectedFeature.NAME || 'N/A'}</p>
+              <p>Alzheimers Incidence Rate by County: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+            </>
+          )}
         </div>
       )}
     </div>
   );
+};
+
+// Functions to process CSV data
+const processPumaCsvData = (csvData) => {
+  return csvData.map(row => ({
+    ...row,
+    GEOID: row.GEOID,
+    percentage: row.percentage ? parseFloat(row.percentage) : null
+  })).filter(row => row.GEOID && row.percentage !== null);
+};
+
+const processCountyCsvData = (csvData) => {
+  return csvData.map(row => ({
+    ...row,
+    GEOID: row.GEOID,
+    percentage: row.percentage ? parseFloat(row.percentage) : null
+  })).filter(row => row.GEOID && row.percentage !== null);
+};
+
+// Functions to merge CSV data with GeoJSON data
+const mergePumaData = (geoJson, csvData) => {
+  return geoJson.features.map(feature => {
+    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.GEOID10);
+
+    if (matchingCsvData) {
+      console.log('PUMA Match:', matchingCsvData, feature);
+      feature.properties.percentage = matchingCsvData.percentage;
+    }
+    return feature;
+  });
+};
+
+const mergeCountyData = (geoJson, csvData) => {
+  return geoJson.features.map(feature => {
+    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.COUNTYFP);
+
+    if (matchingCsvData) {
+      console.log('County Match:', matchingCsvData, feature);
+      feature.properties.percentage = matchingCsvData.percentage;
+    }
+    return feature;
+  });
 };
 
 export default MapComponent;
