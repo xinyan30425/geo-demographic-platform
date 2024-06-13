@@ -28,7 +28,7 @@ const MapComponent = ({ geography, variable }) => {
               ? '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv' 
               : '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withoutedu.csv';
             mergeKey = 'GEOID10';
-          } else if (geography === 'county') {
+          } else if (geography === 'county2') {
             geoJsonPath = '/data/modified_county_maine.geojson';
             csvPath = '/data/NCHS_Maine_County_Level_Alzheimer_Estimates.csv';
             mergeKey = 'COUNTYFP';
@@ -44,9 +44,9 @@ const MapComponent = ({ geography, variable }) => {
             geoJsonPath = '/data/Maine_ZCTAs.geojson';
             csvPath = '/data/zipcode_maine_alzheimers_direct_estimates.csv';
             mergeKey = 'ZCTA5CE10';
-          } else if (geography === 'county') {
-            geoJsonPath = '/data/county_maine.geojson';
-            csvPath = '/data/NCHS_Maine_County_Level_Alzheimer_Estimates.csv';
+          } else if (geography === 'county1') {
+            geoJsonPath = '/data/modified_county_maine.geojson';
+            csvPath = '/data/county_maine_direct_estimates.csv';
             mergeKey = 'COUNTYFP';
           } else if (geography === 'district') {
             geoJsonPath = '/data/district_maine.geojson';
@@ -87,9 +87,9 @@ const MapComponent = ({ geography, variable }) => {
         if (geography === 'puma') {
           processedCsvData = processPumaCsvData(csvData);
           mergedData = mergePumaData(geoJson, processedCsvData);
-        } else if (geography === 'county') {
-          processedCsvData = processCountyCsvData(csvData);
-          mergedData = mergeCountyData(geoJson, processedCsvData);
+        } else if (geography === 'county2') {
+          processedCsvData = processCounty2CsvData(csvData);
+          mergedData = mergeCounty2Data(geoJson, processedCsvData);
         } else if (geography === 'tract') {
           processedCsvData = processTractCsvData(csvData);
           geoJson = cleanTractGeoJson(geoJson);
@@ -97,6 +97,9 @@ const MapComponent = ({ geography, variable }) => {
         } else if (geography === 'zipcode') {
           processedCsvData = processZipcodeCsvData(csvData);
           mergedData = mergeZipcodeData(geoJson, processedCsvData, mergeKey);
+        } else if (geography === 'county1') {
+          processedCsvData = processCounty1CsvData(csvData);
+          mergedData = mergeCounty1Data(geoJson, processedCsvData);
         } else if (geography === 'district') {
           processedCsvData = processDistrictCsvData(csvData);
           mergedData = mergeDistrictData(geoJson, processedCsvData, mergeKey);
@@ -235,7 +238,7 @@ const MapComponent = ({ geography, variable }) => {
               <p>Alzheimers Incidence Rate by PUMA: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
-          {geography === 'county' && (
+          {geography === 'county2' && (
             <>
               <p>{selectedFeature.NAME || 'N/A'}</p>
               <p>Alzheimers Incidence Rate by County: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
@@ -249,8 +252,14 @@ const MapComponent = ({ geography, variable }) => {
           )}
           {geography === 'zipcode' && (
             <>
-              <p>{selectedFeature.ZCTA5CE10 || 'N/A'}</p>
+              <p>Zipcode: {selectedFeature.ZCTA5CE10 || 'N/A'}</p>
               <p>Alzheimers Incidence Rate by Zipcode: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+            </>
+          )}
+          {geography === 'county1' && (
+            <>
+              <p>{selectedFeature.NAME || 'N/A'}</p>
+              <p>Alzheimers Incidence Rate by County: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
           {geography === 'district' && (
@@ -280,7 +289,7 @@ const processPumaCsvData = (csvData) => {
   })).filter(row => row.GEOID && row.percentage !== null);
 };
 
-const processCountyCsvData = (csvData) => {
+const processCounty2CsvData = (csvData) => {
   return csvData.map(row => ({
     ...row,
     GEOID: row.GEOID,
@@ -301,6 +310,14 @@ const processZipcodeCsvData = (csvData) => {
   return csvData.map(row => ({
     ...row,
     GEOID: row.GEOID.replace(/^0+/, ''), // Remove leading zeros
+    percentage: row.percentage ? parseFloat(row.percentage) : null
+  })).filter(row => row.GEOID && row.percentage !== null);
+};
+
+const processCounty1CsvData = (csvData) => {
+  return csvData.map(row => ({
+    ...row,
+    GEOID: row.GEOID,
     percentage: row.percentage ? parseFloat(row.percentage) : null
   })).filter(row => row.GEOID && row.percentage !== null);
 };
@@ -343,7 +360,7 @@ const mergePumaData = (geoJson, csvData) => {
   });
 };
 
-const mergeCountyData = (geoJson, csvData) => {
+const mergeCounty2Data = (geoJson, csvData) => {
   return geoJson.features.map(feature => {
     const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.COUNTYFP);
 
@@ -373,6 +390,18 @@ const mergeZipcodeData = (geoJson, csvData, mergeKey) => {
     const matchingCsvData = csvData.find(row => row.GEOID === featureGEOID);
 
     if (matchingCsvData) {
+      feature.properties.percentage = matchingCsvData.percentage;
+    }
+    return feature;
+  });
+};
+
+const mergeCounty1Data = (geoJson, csvData) => {
+  return geoJson.features.map(feature => {
+    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.COUNTYFP);
+
+    if (matchingCsvData) {
+      console.log('County Match:', matchingCsvData, feature);
       feature.properties.percentage = matchingCsvData.percentage;
     }
     return feature;

@@ -116,14 +116,14 @@ const Sidebar = ({ onGeographyChange, onVariableChange }) => {
               {selectedEstimate === 'DirectEstimates' ? (
                 [
                   <MenuItem key="zipcode" value="zipcode">Zipcode</MenuItem>,
-                  <MenuItem key="county" value="county">County</MenuItem>,
+                  <MenuItem key="county1" value="county1">County</MenuItem>,
                   <MenuItem key="district" value="district">District</MenuItem>,
                   <MenuItem key="urbanRural" value="urbanRural">Urban Rural</MenuItem>
                 ]
               ) : (
                 [
                   <MenuItem key="puma" value="puma">PUMA</MenuItem>,
-                  <MenuItem key="county" value="county">County</MenuItem>,
+                  <MenuItem key="county2" value="county2">County</MenuItem>,
                   <MenuItem key="tract" value="tract">Tract</MenuItem>
                 ]
               )}
