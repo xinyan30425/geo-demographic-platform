@@ -53,9 +53,9 @@ const MapComponent = ({ geography, variable }) => {
             csvPath = '/data/district_maine_alzheimers_direct_estimates.csv';
             mergeKey = 'District';
           } else if (geography === 'urbanRural') {
-            geoJsonPath = '/data/urban_rural_maine.geojson';
-            csvPath = '/data/urban_rural_maine_alzheimers_direct_estimates.csv';
-            mergeKey = 'URFP';
+            geoJsonPath = '/data/maine_urbnrrl.geojson';
+            csvPath = '/data/maine_urbnrrl.csv';
+            mergeKey = 'URBNRRL';
           }
         }
 
@@ -270,7 +270,7 @@ const MapComponent = ({ geography, variable }) => {
           )}
           {geography === 'urbanRural' && (
             <>
-              <p>{selectedFeature.URFP || 'N/A'}</p>
+              <p>{selectedFeature.URBNRRL || 'N/A'}</p>
               <p>Alzheimers Incidence Rate by Urban/Rural: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
@@ -335,6 +335,7 @@ const processUrbanRuralCsvData = (csvData) => {
   return csvData.map(row => ({
     ...row,
     GEOID: row.GEOID,
+    name: row.NAME, 
     percentage: row.percentage ? parseFloat(row.percentage) : null
   })).filter(row => row.GEOID && row.percentage !== null);
 };
@@ -436,14 +437,26 @@ const mergeDistrictData = (geoJson, csvData) => {
   });
 };
 
+const mergeUrbanRuralData = (geoJson, csvData) => {
+  return geoJson.features.map((feature, index) => {
+    const URBNRRLCode = feature.properties['URBNRRL'];
 
+    if (!URBNRRLCode) {
+      console.warn(`Feature at index ${index} has no URBNRRL code. Feature properties:`, feature.properties);
+      return feature;
+    }
 
-const mergeUrbanRuralData = (geoJson, csvData, mergeKey) => {
-  return geoJson.features.map(feature => {
-    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties[mergeKey]);
+    // Log the district code being processed
+    // console.log(`Processing district code: ${districtCode}`);
+
+    const matchingCsvData = csvData.find(row => row.GEOID.toString() === URBNRRLCode.toString());
 
     if (matchingCsvData) {
-      feature.properties.percentage = matchingCsvData.percentage;
+      console.log('URBNRRL Match:', matchingCsvData, feature);
+      feature.properties.percentage = parseFloat(matchingCsvData.percentage);  // Ensure the percentage is a number
+      feature.properties.name = matchingCsvData.name; 
+    } else {
+      console.warn(`No match found for URBNRRL code: ${URBNRRLCode}`);
     }
     return feature;
   });
