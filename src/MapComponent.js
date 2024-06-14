@@ -264,7 +264,7 @@ const MapComponent = ({ geography, variable }) => {
           )}
           {geography === 'district' && (
             <>
-              <p>District: {selectedFeature.District || 'N/A'}</p>
+              <p>{selectedFeature.name || 'N/A'}</p> 
               <p>Alzheimers Incidence Rate by District: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
@@ -326,6 +326,7 @@ const processDistrictCsvData = (csvData) => {
   return csvData.map(row => ({
     ...row,
     GEOID: row.GEOID,
+    name: row.name, 
     percentage: row.percentage ? parseFloat(row.percentage) : null
   })).filter(row => row.GEOID && row.percentage !== null);
 };
@@ -427,6 +428,7 @@ const mergeDistrictData = (geoJson, csvData) => {
     if (matchingCsvData) {
       console.log('District Match:', matchingCsvData, feature);
       feature.properties.percentage = parseFloat(matchingCsvData.percentage);  // Ensure the percentage is a number
+      feature.properties.name = matchingCsvData.name; 
     } else {
       console.warn(`No match found for district code: ${districtCode}`);
     }
