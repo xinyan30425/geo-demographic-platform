@@ -49,9 +49,9 @@ const MapComponent = ({ geography, variable }) => {
             csvPath = '/data/county_maine_direct_estimates.csv';
             mergeKey = 'COUNTYFP';
           } else if (geography === 'district') {
-            geoJsonPath = '/data/district_maine.geojson';
+            geoJsonPath = '/data/Maine_district.geojson';
             csvPath = '/data/district_maine_alzheimers_direct_estimates.csv';
-            mergeKey = 'DISTRICTFP';
+            mergeKey = 'District';
           } else if (geography === 'urbanRural') {
             geoJsonPath = '/data/urban_rural_maine.geojson';
             csvPath = '/data/urban_rural_maine_alzheimers_direct_estimates.csv';
@@ -102,7 +102,7 @@ const MapComponent = ({ geography, variable }) => {
           mergedData = mergeCounty1Data(geoJson, processedCsvData);
         } else if (geography === 'district') {
           processedCsvData = processDistrictCsvData(csvData);
-          mergedData = mergeDistrictData(geoJson, processedCsvData, mergeKey);
+          mergedData = mergeDistrictData(geoJson, processedCsvData);
         } else if (geography === 'urbanRural') {
           processedCsvData = processUrbanRuralCsvData(csvData);
           mergedData = mergeUrbanRuralData(geoJson, processedCsvData, mergeKey);
@@ -264,7 +264,7 @@ const MapComponent = ({ geography, variable }) => {
           )}
           {geography === 'district' && (
             <>
-              <p>{selectedFeature.DISTRICTFP || 'N/A'}</p>
+              <p>District: {selectedFeature.District || 'N/A'}</p>
               <p>Alzheimers Incidence Rate by District: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
@@ -408,16 +408,33 @@ const mergeCounty1Data = (geoJson, csvData) => {
   });
 };
 
-const mergeDistrictData = (geoJson, csvData, mergeKey) => {
-  return geoJson.features.map(feature => {
-    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties[mergeKey]);
+
+// Function to merge CSV data with GeoJSON// Function to merge CSV data with GeoJSON
+const mergeDistrictData = (geoJson, csvData) => {
+  return geoJson.features.map((feature, index) => {
+    const districtCode = feature.properties['District'];
+
+    if (!districtCode) {
+      console.warn(`Feature at index ${index} has no District code. Feature properties:`, feature.properties);
+      return feature;
+    }
+
+    // Log the district code being processed
+    console.log(`Processing district code: ${districtCode}`);
+
+    const matchingCsvData = csvData.find(row => row.GEOID.toString() === districtCode.toString());
 
     if (matchingCsvData) {
-      feature.properties.percentage = matchingCsvData.percentage;
+      console.log('District Match:', matchingCsvData, feature);
+      feature.properties.percentage = parseFloat(matchingCsvData.percentage);  // Ensure the percentage is a number
+    } else {
+      console.warn(`No match found for district code: ${districtCode}`);
     }
     return feature;
   });
 };
+
+
 
 const mergeUrbanRuralData = (geoJson, csvData, mergeKey) => {
   return geoJson.features.map(feature => {
