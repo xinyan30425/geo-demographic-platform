@@ -15,6 +15,7 @@ const Legend = () => {
       <div><i style={{ background: '#FEB24C' }}></i> 6% - 7%</div>
       <div><i style={{ background: '#FFEDA0' }}></i> 5% - 6%</div>
       <div><i style={{ background: '#FFFAF0' }}></i> &lt; 5%</div>
+      <div><i style={{ background: '#FFFFFF', border: '1px solid #000' }}></i> NA</div> {/* New entry for NA values */}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
 import Legend from './Legend';
 
-const MapComponent = ({ geography, variable }) => {
+const MapComponent = ({ geography, variable, age, sex, race }) => {
   const [geoData, setGeoData] = useState(null);
   const [mergedGeoData, setMergedGeoData] = useState(null);
   const [selectedFeature, setSelectedFeature] = useState(null);
@@ -13,7 +13,7 @@ const MapComponent = ({ geography, variable }) => {
   const [showCursor, setShowCursor] = useState(false);
 
   useEffect(() => {
-    console.log("Fetching data for geography:", geography, "and variable:", variable);
+    console.log("Fetching data for geography:", geography, "and variable:", variable, "with demographics:", age, sex, race);
 
     const fetchData = async () => {
       try {
@@ -24,9 +24,15 @@ const MapComponent = ({ geography, variable }) => {
         if (variable === 'Dhanawithedu' || variable === 'Dhanawithoutedu') {
           if (geography === 'puma') {
             geoJsonPath = '/data/puma_maine.geojson';
-            csvPath = variable === 'Dhanawithedu' 
-              ? '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv' 
-              : '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withoutedu.csv';
+            if (age || sex || race) {
+              csvPath = variable === 'Dhanawithedu' 
+                ? '/data/maine_puma_binary_withedu2.csv' 
+                : '/data/maine_puma_binary_withoutedu2.csv';
+            } else {
+              csvPath = variable === 'Dhanawithedu' 
+                ? '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv' 
+                : '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withoutedu.csv';
+            }
             mergeKey = 'GEOID10';
           } else if (geography === 'county2') {
             geoJsonPath = '/data/modified_county_maine.geojson';
@@ -85,8 +91,13 @@ const MapComponent = ({ geography, variable }) => {
         console.log("CSV Data:", csvData);
 
         if (geography === 'puma') {
-          processedCsvData = processPumaCsvData(csvData);
-          mergedData = mergePumaData(geoJson, processedCsvData);
+          if (!age && !sex && !race) {
+            processedCsvData = processPumaCsvData(csvData);
+            mergedData = mergePumaData(geoJson, processedCsvData);
+          } else {
+            processedCsvData = processPumaCsvDataWithDemographics(csvData, age, sex, race);
+            mergedData = mergePumaDataWithDemographics(geoJson, processedCsvData);
+          }
         } else if (geography === 'county2') {
           processedCsvData = processCounty2CsvData(csvData);
           mergedData = mergeCounty2Data(geoJson, processedCsvData);
@@ -121,7 +132,7 @@ const MapComponent = ({ geography, variable }) => {
     };
 
     fetchData();
-  }, [geography, variable]); // Re-run the effect when geography or variable changes
+  }, [geography, variable, age, sex, race]); // Re-run the effect when geography, variable, age, sex, or race changes
 
   const styleFeature = feature => ({
     fillColor: getColor(feature.properties.percentage),
@@ -133,6 +144,7 @@ const MapComponent = ({ geography, variable }) => {
   });
 
   const getColor = d => {
+    if (d === 'NA' || d === null || d === undefined) return '#FFFFFF'; // White color for 'NA' values
     return d > 10.5 ? '#800026' :
       d > 10 ? '#BD0026' :
       d > 9 ? '#E31A1C' :
@@ -201,7 +213,7 @@ const MapComponent = ({ geography, variable }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <GeoJSON key={`${geography}-${variable}-${Date.now()}`} data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
+        <GeoJSON key={`${geography}-${variable}-${age}-${sex}-${race}-${Date.now()}`} data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
         <Legend />
       </MapContainer>
 
@@ -235,6 +247,7 @@ const MapComponent = ({ geography, variable }) => {
           {geography === 'puma' && (
             <>
               <p>{selectedFeature.NAMELSAD10 || 'N/A'}</p>
+              <p>PUMA: {selectedFeature.GEOID10 || 'N/A'}</p>
               <p>Alzheimers Incidence Rate by PUMA: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
@@ -288,6 +301,30 @@ const processPumaCsvData = (csvData) => {
     percentage: row.percentage ? parseFloat(row.percentage) : null
   })).filter(row => row.GEOID && row.percentage !== null);
 };
+
+const processPumaCsvDataWithDemographics = (csvData, age, sex, race) => {
+  const filteredData = csvData.filter(row => 
+    (!age || row[age] === '1') && 
+    (!sex || row[sex] === '1') && 
+    (!race || row[race] === '1')
+  );
+
+  // Create a mapping of GEOID to the corresponding filtered row
+  const geoDataMap = new Map();
+  filteredData.forEach(row => {
+    const geoId = row.GEOID;
+    if (!geoDataMap.has(geoId)) {
+      geoDataMap.set(geoId, row);
+    }
+  });
+
+  return Array.from(geoDataMap.values()).map(row => ({
+    ...row,
+    GEOID: row.GEOID,
+    percentage: row.percentage ? parseFloat(row.percentage) : null
+  })).filter(row => row.GEOID && row.percentage !== null);
+};
+
 
 const processCounty2CsvData = (csvData) => {
   return csvData.map(row => ({
@@ -362,6 +399,19 @@ const mergePumaData = (geoJson, csvData) => {
   });
 };
 
+const mergePumaDataWithDemographics = (geoJson, csvData) => {
+  return geoJson.features.map(feature => {
+    const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.GEOID10);
+
+    if (matchingCsvData) {
+      console.log('PUMA Match with Demographics:', matchingCsvData, feature);
+      feature.properties.percentage = matchingCsvData.percentage;
+    }
+    return feature;
+  });
+};
+
+
 const mergeCounty2Data = (geoJson, csvData) => {
   return geoJson.features.map(feature => {
     const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.COUNTYFP);
@@ -410,8 +460,6 @@ const mergeCounty1Data = (geoJson, csvData) => {
   });
 };
 
-
-// Function to merge CSV data with GeoJSON// Function to merge CSV data with GeoJSON
 const mergeDistrictData = (geoJson, csvData) => {
   return geoJson.features.map((feature, index) => {
     const districtCode = feature.properties['District'];
@@ -445,9 +493,6 @@ const mergeUrbanRuralData = (geoJson, csvData) => {
       console.warn(`Feature at index ${index} has no URBNRRL code. Feature properties:`, feature.properties);
       return feature;
     }
-
-    // Log the district code being processed
-    // console.log(`Processing district code: ${districtCode}`);
 
     const matchingCsvData = csvData.find(row => row.GEOID.toString() === URBNRRLCode.toString());
 

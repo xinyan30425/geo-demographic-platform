@@ -21,9 +21,13 @@ const theme = createTheme({
   },
 });
 
-const Sidebar = ({ onGeographyChange, onVariableChange }) => {
+const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange, onRaceChange, onDemographicChange }) => {
   const [selectedEstimate, setSelectedEstimate] = useState('');
-  const [selectedGeography, setSelectedGeography] = useState('county');
+  const [selectedGeography, setSelectedGeography] = useState('');
+  const [selectedAge, setSelectedAge] = useState('');
+  const [selectedSex, setSelectedSex] = useState('');
+  const [selectedRace, setSelectedRace] = useState('');
+  const [showDemographics, setShowDemographics] = useState(false);
 
   const handleVariableChange = (event) => {
     setSelectedEstimate(event.target.value);
@@ -34,6 +38,36 @@ const Sidebar = ({ onGeographyChange, onVariableChange }) => {
     setSelectedGeography(event.target.value);
     onGeographyChange(event.target.value);
   };
+
+  const handleAgeChange = (event) => {
+    setSelectedAge(event.target.value);
+    onAgeChange(event.target.value);
+  };
+
+  const handleSexChange = (event) => {
+    setSelectedSex(event.target.value);
+    onSexChange(event.target.value);
+  };
+
+  const handleRaceChange = (event) => {
+    setSelectedRace(event.target.value);
+    onRaceChange(event.target.value);
+  };
+
+  const handleDemographicChange = (event) => {
+    setShowDemographics(event.target.value === 'Yes');
+    onDemographicChange(event.target.value === 'Yes');
+  };
+
+  const ageOptions = selectedEstimate === 'DirectEstimates'
+    ? ["45-64", "65-69", "70-74", "75-79", "80-84", "85+"]
+    : ["65-69", "70-74", "75-79", "80-84", "85+"];
+
+  const sexOptions = ["Male", "Female"];
+
+  const raceOptions = selectedEstimate === 'DirectEstimates'
+    ? ["Hispanic", "Black", "White", "Asian and PI", "American Indian or Alaska Native", "Other"]
+    : ["Hispanic", "Black", "Other"];
 
   const dropdownStyle = {
     fontSize: '14px',
@@ -108,7 +142,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange }) => {
               onChange={handleGeographyChange}
               startAdornment={
                 <InputAdornment position="start">
-                  <PublicIcon />
+                  <PublicIcon sx={iconStyle} />
                 </InputAdornment>
               }
               sx={selectFieldStyle}
@@ -130,6 +164,69 @@ const Sidebar = ({ onGeographyChange, onVariableChange }) => {
             </Select>
           </FormControl>
         </Box>
+
+        <Box sx={{ marginBottom: 2 }}>
+          <Typography>Select Demographic Variables</Typography>
+          <FormControl fullWidth>
+            <Select
+              value={showDemographics ? 'Yes' : 'No'}
+              onChange={handleDemographicChange}
+              sx={selectFieldStyle}
+            >
+              <MenuItem value="Yes">Yes</MenuItem>
+              <MenuItem value="No">No</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        {showDemographics && (
+          <>
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography>Select Age</Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={selectedAge}
+                  onChange={handleAgeChange}
+                  sx={selectFieldStyle}
+                >
+                  {ageOptions.map(age => (
+                    <MenuItem key={age} value={age}>{age}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography>Select Sex</Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={selectedSex}
+                  onChange={handleSexChange}
+                  sx={selectFieldStyle}
+                >
+                  {sexOptions.map(sex => (
+                    <MenuItem key={sex} value={sex}>{sex}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography>Select Race</Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={selectedRace}
+                  onChange={handleRaceChange}
+                  sx={selectFieldStyle}
+                >
+                  {raceOptions.map(race => (
+                    <MenuItem key={race} value={race}>{race}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </>
+        )}
       </Box>
     </ThemeProvider>
   );
