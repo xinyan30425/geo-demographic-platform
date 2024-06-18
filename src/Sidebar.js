@@ -130,6 +130,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
               <MenuItem value="Dhanawithedu">Dhana ADRD model with education</MenuItem>
               <MenuItem value="Dhanawithoutedu">Dhana ADRD model without education</MenuItem>
               <MenuItem value="DirectEstimates">MaineCDC BRFSS Cognitive decline Direct estimates</MenuItem>
+              <MenuItem value="Claims">Maine Health ADRD Claims Data</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -154,7 +155,9 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
                   <MenuItem key="district" value="district">District</MenuItem>,
                   <MenuItem key="urbanRural" value="urbanRural">Urban Rural</MenuItem>
                 ]
-              ) : (
+              ) : selectedEstimate === 'Claims' ? (
+                <MenuItem key="county3" value="county3">County</MenuItem>
+              ):(
                 [
                   <MenuItem key="puma" value="puma">PUMA</MenuItem>,
                   <MenuItem key="county2" value="county2">County</MenuItem>,
@@ -233,131 +236,3 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
 };
 
 export default Sidebar;
-
-
-
-{/* <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select School Type</Typography>
-          <TextField
-            select
-            SelectProps={{
-              onChange: onVariableChange,
-              sx: dropdownStyle,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SchoolIcon sx={iconStyle} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyle}
-            defaultValue=""
-          >
-            <MenuItem value="elementary">Elementary</MenuItem>
-            <MenuItem value="middleSchool">Middle School</MenuItem>
-            <MenuItem value="highSchool">High School</MenuItem>
-          </TextField>
-        </Box> */}
-
-        {/* <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select MIYHS Topic Area</Typography>
-          <TextField
-            select
-            SelectProps={{
-              onChange: onVariableChange,
-              sx: dropdownStyle,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <HealthAndSafetyIcon sx={iconStyle} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyle}
-            defaultValue=""
-          >
-            <MenuItem value="foodSupply">Food Supply</MenuItem>
-            <MenuItem value="foodInsecurity">Food Insecurity</MenuItem>
-            <MenuItem value="highFatFood">Have High Fat Food</MenuItem>
-            <MenuItem value="mentalHealth">Mental Health</MenuItem>
-          </TextField>
-        </Box> */}
-
-                {/* <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select Gender</Typography>
-          <TextField
-            select
-            SelectProps={{
-              onChange: onVariableChange,
-              sx: dropdownStyle,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <WcIcon sx={iconStyle} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyle}
-            defaultValue=""
-          >
-            <MenuItem value="female">Female</MenuItem>
-            <MenuItem value="male">Male</MenuItem>
-          </TextField>
-        </Box> */}
-
-        {/* <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select Race</Typography>
-          <TextField
-            select
-            SelectProps={{
-              onChange: onVariableChange,
-              sx: dropdownStyle,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PeopleIcon sx={iconStyle} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyle}
-            defaultValue=""
-          >
-            <MenuItem value="hispanic">Hispanic</MenuItem>
-            <MenuItem value="black">Black</MenuItem>
-            <MenuItem value="white">White</MenuItem>
-            <MenuItem value="asian">Asian and PI</MenuItem>
-            <MenuItem value="americanIndian">American Indian</MenuItem>
-            <MenuItem value="other">Other</MenuItem>
-          </TextField>
-        </Box> */}
-
-        {/* <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={labelStyle}>Select Grade</Typography>
-          <TextField
-            select
-            SelectProps={{
-              onChange: onVariableChange,
-              sx: dropdownStyle,
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <CakeIcon sx={iconStyle} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyle}
-            defaultValue=""
-          >
-            <MenuItem value="0-4">1-2</MenuItem>
-            <MenuItem value="5-9">3-4</MenuItem>
-            <MenuItem value="10-14">5-6</MenuItem>
-            <MenuItem value="15-19">7-8</MenuItem>
-            <MenuItem value="20-25">9-10</MenuItem>
-            <MenuItem value="20-25">11-12</MenuItem>
-          </TextField>
-        </Box> */}
