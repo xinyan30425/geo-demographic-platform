@@ -136,7 +136,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
         </Box>
 
         <Box sx={{ marginBottom: 2 }}>
-          <Typography>Select Geography</Typography>
+          <Typography sx={labelStyle}>Select Geography</Typography>
           <FormControl fullWidth>
             <Select
               value={selectedGeography}
@@ -157,19 +157,24 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
                 ]
               ) : selectedEstimate === 'Claims' ? (
                 <MenuItem key="county3" value="county3">County</MenuItem>
-              ):(
+              ) : selectedEstimate === 'Dhanawithoutedu' ? (
                 [
                   <MenuItem key="puma" value="puma">PUMA</MenuItem>,
                   <MenuItem key="county2" value="county2">County</MenuItem>,
                   <MenuItem key="tract" value="tract">Tract</MenuItem>
                 ]
-              )}
+              ) : selectedEstimate === 'Dhanawithedu' ? (
+                [
+                  <MenuItem key="puma" value="puma">PUMA</MenuItem>,
+                  <MenuItem key="tract" value="tract">Tract</MenuItem>
+                ]
+              ) : null}
             </Select>
           </FormControl>
         </Box>
 
         <Box sx={{ marginBottom: 2 }}>
-          <Typography>Select Demographic Variables</Typography>
+          <Typography sx={labelStyle}>Select Demographic Variables</Typography>
           <FormControl fullWidth>
             <Select
               value={showDemographics ? 'Yes' : 'No'}
@@ -185,7 +190,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
         {showDemographics && (
           <>
             <Box sx={{ marginBottom: 2 }}>
-              <Typography>Select Age</Typography>
+              <Typography sx={labelStyle}>Select Age</Typography>
               <FormControl fullWidth>
                 <Select
                   value={selectedAge}
@@ -200,7 +205,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
             </Box>
 
             <Box sx={{ marginBottom: 2 }}>
-              <Typography>Select Sex</Typography>
+              <Typography sx={labelStyle}>Select Sex</Typography>
               <FormControl fullWidth>
                 <Select
                   value={selectedSex}
@@ -215,7 +220,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
             </Box>
 
             <Box sx={{ marginBottom: 2 }}>
-              <Typography>Select Race</Typography>
+              <Typography sx={labelStyle}>Select Race</Typography>
               <FormControl fullWidth>
                 <Select
                   value={selectedRace}
