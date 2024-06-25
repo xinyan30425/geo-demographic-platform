@@ -224,8 +224,10 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
         className="leaflet-map-container"
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          // url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+          attribution='&copy; <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, &copy; OpenStreetMap contributors, and the GIS user community'
         />
         <GeoJSON key={`${geography}-${variable}-${age}-${sex}-${race}-${education}-${year}-${Date.now()}`} data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
         <Legend />
@@ -394,7 +396,7 @@ const processCounty3CsvData = (csvData) => {
   return csvData.map(row => ({
     ...row,
     GEOID: row.GEOID,
-    percentage: row['Alzheimer Disease Claims percentage'] ? parseFloat(row['Alzheimer Disease Claims percentage']) : null
+    percentage: row['Alzheimer Disease and Non Alzheimer Dementia Individuals percentage'] ? parseFloat(row['Alzheimer Disease and Non Alzheimer Dementia Individuals percentage']) : null
   })).filter(row => row.GEOID && row.percentage !== null);
 };
 

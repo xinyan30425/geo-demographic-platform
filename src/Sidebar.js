@@ -8,7 +8,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#F4A460',
+      main: '#ffab40', // Apricot color
+    },
+    text: {
+      primary: '#333333', // Dark grey color for text
     },
   },
   typography: {
@@ -16,10 +19,11 @@ const theme = createTheme({
     h5: {
       fontFamily: 'Georgia, serif',
       fontWeight: 'bold',
-      color: '#F4A460',
+      color: '#333333', // Dark grey color for text
     },
   },
 });
+
 
 const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange, onRaceChange, onEducationChange, onYearChange, onDemographicChange }) => {
   const [selectedEstimate, setSelectedEstimate] = useState('');
@@ -107,14 +111,14 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
   const labelStyle = {
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#F4A460',
+    color: '#333333', // Dark grey color for text
     marginBottom: '5px',
   };
 
   const typographyStyle = {
     fontSize: '18px',
     fontWeight: 'bold',
-    color: '#F4A460',
+    color: '#333333', // Dark grey color for text
     marginBottom: '20px',
     fontFamily: 'Georgia, serif',
   };
@@ -131,12 +135,12 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: 300, padding: 3, background: 'linear-gradient(135deg, #4f4f4f, #666666)', borderRadius: 0, boxShadow: 3 }}>
+      <Box sx={{ width: 300, padding: 3, background: '#ffab40', borderRadius: 0, boxShadow: 3 }}>
         <Typography variant="h5" gutterBottom>
           Select desired options to populate dashboard
         </Typography>
 
-        <Divider sx={{ marginBottom: 2, backgroundColor: '#F4A460' }} />
+        <Divider sx={{ marginBottom: 2, backgroundColor: '#333333' }} />
 
         <Box sx={{ marginBottom: 2 }}>
           <Typography sx={labelStyle}>Select Estimates</Typography>
