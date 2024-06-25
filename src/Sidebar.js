@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { MenuItem, FormControl, InputLabel, Typography, Box, Select, InputAdornment, Divider } from '@mui/material';
-import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
+import { MenuItem, FormControl,Typography, Box, Select, InputAdornment, Divider } from '@mui/material';
 import PublicIcon from '@mui/icons-material/Public';
 import SchoolIcon from '@mui/icons-material/School';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -97,16 +96,16 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
   const yearOptionsDirectEstimates = ["2012", "2016", "2017", "2018", "2020"];
   const yearOptionsClaims = ["2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"];
 
-  const dropdownStyle = {
-    fontSize: '14px',
-    padding: '0px',
-    backgroundColor: '#fff',
-    borderRadius: '4px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    '&:hover': {
-      backgroundColor: '#f5f5f5',
-    },
-  };
+  // const dropdownStyle = {
+  //   fontSize: '14px',
+  //   padding: '0px',
+  //   backgroundColor: '#fff',
+  //   borderRadius: '4px',
+  //   boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+  //   '&:hover': {
+  //     backgroundColor: '#f5f5f5',
+  //   },
+  // };
 
   const labelStyle = {
     fontSize: '14px',
@@ -115,13 +114,13 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
     marginBottom: '5px',
   };
 
-  const typographyStyle = {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    color: '#333333', // Dark grey color for text
-    marginBottom: '20px',
-    fontFamily: 'Georgia, serif',
-  };
+  // const typographyStyle = {
+  //   fontSize: '18px',
+  //   fontWeight: 'bold',
+  //   color: '#333333', // Dark grey color for text
+  //   marginBottom: '20px',
+  //   fontFamily: 'Georgia, serif',
+  // };
 
   const iconStyle = {
     marginRight: '8px',
