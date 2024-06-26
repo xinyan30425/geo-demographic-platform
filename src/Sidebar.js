@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { MenuItem, FormControl,Typography, Box, Select, InputAdornment, Divider } from '@mui/material';
+import { MenuItem, FormControl, Typography, Box, Select, InputAdornment, Divider } from '@mui/material';
 import PublicIcon from '@mui/icons-material/Public';
 import SchoolIcon from '@mui/icons-material/School';
+import MaleIcon from '@mui/icons-material/Male';
+import FemaleIcon from '@mui/icons-material/Female';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import GroupIcon from '@mui/icons-material/Group';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -22,7 +26,6 @@ const theme = createTheme({
     },
   },
 });
-
 
 const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange, onRaceChange, onEducationChange, onYearChange, onDemographicChange }) => {
   const [selectedEstimate, setSelectedEstimate] = useState('');
@@ -96,31 +99,12 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
   const yearOptionsDirectEstimates = ["2012", "2016", "2017", "2018", "2020"];
   const yearOptionsClaims = ["2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"];
 
-  // const dropdownStyle = {
-  //   fontSize: '14px',
-  //   padding: '0px',
-  //   backgroundColor: '#fff',
-  //   borderRadius: '4px',
-  //   boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-  //   '&:hover': {
-  //     backgroundColor: '#f5f5f5',
-  //   },
-  // };
-
   const labelStyle = {
     fontSize: '14px',
     fontWeight: 'bold',
     color: '#333333', // Dark grey color for text
     marginBottom: '5px',
   };
-
-  // const typographyStyle = {
-  //   fontSize: '18px',
-  //   fontWeight: 'bold',
-  //   color: '#333333', // Dark grey color for text
-  //   marginBottom: '20px',
-  //   fontFamily: 'Georgia, serif',
-  // };
 
   const iconStyle = {
     marginRight: '8px',
@@ -130,6 +114,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
     width: '100%',
     height: '40px',
     fontSize: '14px',
+    backgroundColor: '#ffffff',
   };
 
   return (
@@ -207,6 +192,11 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
               <Select
                 value={selectedYear}
                 onChange={handleYearChange}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <AccessTimeIcon sx={iconStyle} />
+                  </InputAdornment>
+                }
                 sx={selectFieldStyle}
               >
                 {yearOptionsDirectEstimates.map(year => (
@@ -241,6 +231,11 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
                     <Select
                       value={selectedAge}
                       onChange={handleAgeChange}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <AccessTimeIcon sx={iconStyle} />
+                        </InputAdornment>
+                      }
                       sx={selectFieldStyle}
                     >
                       {ageOptions.map(age => (
@@ -256,6 +251,11 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
                     <Select
                       value={selectedSex}
                       onChange={handleSexChange}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <GroupIcon sx={iconStyle} />
+                        </InputAdornment>
+                      }
                       sx={selectFieldStyle}
                     >
                       {sexOptions.map(sex => (
@@ -271,6 +271,11 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
                     <Select
                       value={selectedRace}
                       onChange={handleRaceChange}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <GroupIcon sx={iconStyle} />
+                        </InputAdornment>
+                      }
                       sx={selectFieldStyle}
                     >
                       {raceOptions.map(race => (
@@ -286,6 +291,11 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
                     <Select
                       value={selectedEducation}
                       onChange={handleEducationChange}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <SchoolIcon sx={iconStyle} />
+                        </InputAdornment>
+                      }
                       sx={selectFieldStyle}
                     >
                       {educationOptions.map(education => (
