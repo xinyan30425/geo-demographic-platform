@@ -143,6 +143,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
               <MenuItem value="Dhanawithoutedu">Dhana ADRD model without education</MenuItem>
               <MenuItem value="DirectEstimates">MaineCDC BRFSS Cognitive decline Direct estimates</MenuItem>
               <MenuItem value="Claims">Maine Health ADRD Claims Data</MenuItem>
+              <MenuItem value="refinedacs">Refined demographics model</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -169,6 +170,8 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
                 ]
               ) : selectedEstimate === 'Claims' ? (
                 <MenuItem key="county3" value="county3">County</MenuItem>
+              ) : selectedEstimate === 'refinedacs' ? (
+                <MenuItem key="puma2" value="puma2">PUMA</MenuItem>
               ) : selectedEstimate === 'Dhanawithedu' ? (
                 [
                   <MenuItem key="puma" value="puma">PUMA</MenuItem>,

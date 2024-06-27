@@ -77,6 +77,11 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
           csvPath = '/data/MH_ADRD_claim_data.csv';
           mergeKey = 'GEOID';
         }
+        else if (variable === 'refinedacs' && geography === 'puma2') {
+          geoJsonPath = '/data/puma_maine.geojson';
+          csvPath = '/data/brfss_acs_puma.csv';
+          mergeKey = 'PUMA';
+        }
 
         if (!geoJsonPath || !csvPath) {
           throw new Error(`Unsupported geography: ${geography} or variable: ${variable}`);
@@ -131,7 +136,10 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
         }  else if (geography === 'puma') {
             processedCsvData = processPumaCsvData(csvData);
             mergedData = mergePumaData(geoJson, processedCsvData);
-        } 
+        } else if (geography === 'puma2' && variable === 'refinedacs') {
+          processedCsvData = processPuma2CsvData(csvData);
+          mergedData = mergePuma2Data(geoJson, processedCsvData);
+        }
 
         // Validate geometries
         const validFeatures = mergedData.filter(feature => feature.geometry && feature.geometry.coordinates && feature.geometry.coordinates.length > 0);
@@ -308,6 +316,12 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
               <p>Alzheimer Disease Claims 65+ Percentage: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
             </>
           )}
+          {geography === 'puma2' && variable === 'refinedacs' && (
+            <>
+              <p>PUMA: {selectedFeature.GEOID10 || 'N/A'}</p>
+              <p>Alzheimer Disease Claims 65+ Percentage: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -347,6 +361,15 @@ const processPumaCsvData = (csvData) => {
     percentage: row.percentage ? parseFloat(row.percentage) : null
   })).filter(row => row.GEOID && row.percentage !== null);
 };
+
+const processPuma2CsvData = (csvData) => {
+  return csvData.map(row => ({
+    ...row,
+    PUMA: row.PUMA.padStart(5, '0'), // Add leading zeros to make sure the PUMA code is 5 digits
+    percentage: row.percentage ? parseFloat(row.percentage) : null
+  })).filter(row => row.PUMA && row.percentage !== null);
+};
+
 
 const processCounty2CsvData = (csvData) => {
   return csvData.map(row => ({
@@ -414,6 +437,18 @@ const cleanTractGeoJson = (geoJson) => {
 const mergePumaData = (geoJson, csvData) => {
   return geoJson.features.map(feature => {
     const matchingCsvData = csvData.find(row => row.GEOID === feature.properties.GEOID10);
+
+    if (matchingCsvData) {
+      console.log('PUMA Match:', matchingCsvData, feature);
+      feature.properties.percentage = matchingCsvData.percentage;
+    }
+    return feature;
+  });
+};
+
+const mergePuma2Data = (geoJson, csvData) => {
+  return geoJson.features.map(feature => {
+    const matchingCsvData = csvData.find(row => row.PUMA === feature.properties.PUMACE10);
 
     if (matchingCsvData) {
       console.log('PUMA Match:', matchingCsvData, feature);
