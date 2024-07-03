@@ -51,8 +51,8 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
             mergeKey = 'COUNTYFP';
           } else if (geography === 'tract') {
             geoJsonPath = '/data/tract_maine.geojson';
-            csvPath = '/data/tract_maine_alzheimer_probabilities_withoutedu.csv';
-            mergeKey = 'GEOID';
+            csvPath = '/data/tract_estimates_new.csv';
+            mergeKey = 'tracta';
           }
         } else if (variable === 'DirectEstimates') {
           if (geography === 'zipcode') {
@@ -382,9 +382,9 @@ const processCounty2CsvData = (csvData) => {
 const processTractCsvData = (csvData) => {
   return csvData.map(row => ({
     ...row,
-    county: row.county1,
+    county: row.countya,
     tracta: row.tracta,
-    percentage: row.percentage ? parseFloat(row.percentage) : null
+    percentage: row.percentage? parseFloat(row.percentage) : null
   })).filter(row => row.county && row.tracta && row.percentage !== null);
 };
 
