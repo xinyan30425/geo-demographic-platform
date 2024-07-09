@@ -35,10 +35,10 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
             geoJsonPath = '/data/puma_maine.geojson';
             csvPath = '/data/ACS_Maine_Puma_Level_Alzheimer_Estimates_withedu.csv';
             mergeKey = 'GEOID10';
-          } else if (geography === 'tract') {
+          } else if (geography === 'tract2') {
             geoJsonPath = '/data/tract_maine.geojson';
-            csvPath = '/data/tract_maine_alzheimer_probabilities_withedu.csv';
-            mergeKey = 'GEOID';
+            csvPath = '/data/ipfp_tract_level_alzheimer_summary.csv';
+            mergeKey = 'tracta';
           }
         } else if (variable === 'Dhanawithoutedu') {
           if (geography === 'puma') {
@@ -133,6 +133,10 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
             processedCsvData = processTractCsvData(csvData);
             geoJson = cleanTractGeoJson(geoJson);
             mergedData = mergeTractData(geoJson, processedCsvData);
+        } else if (geography === 'tract2') {
+              processedCsvData = processTract2CsvData(csvData);
+              geoJson = cleanTract2GeoJson(geoJson);
+              mergedData = mergeTract2Data(geoJson, processedCsvData);
         }  else if (geography === 'puma') {
             processedCsvData = processPumaCsvData(csvData);
             mergedData = mergePumaData(geoJson, processedCsvData);
@@ -286,6 +290,12 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
             <p>Alzheimers Incidence Rate by Tract: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
           </>
         )}
+        {geography === 'tract2' && (
+          <>
+            <p>{selectedFeature.NAMELSAD || 'N/A'}</p>
+            <p>Alzheimers Incidence Rate by Tract: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
+          </>
+        )}
           {geography === 'county1' && (
             <>
               <p>{selectedFeature.NAME || 'N/A'}</p>
@@ -388,6 +398,14 @@ const processTractCsvData = (csvData) => {
   })).filter(row => row.county && row.tracta && row.percentage !== null);
 };
 
+const processTract2CsvData = (csvData) => {
+  return csvData.map(row => ({
+    ...row,
+    tracta: row.tracta,
+    percentage: row.percentage? parseFloat(row.percentage) : null
+  })).filter(row => row.tracta && row.percentage !== null);
+};
+
 
 const processZipcodeCsvData = (csvData) => {
   return csvData.map(row => ({
@@ -428,6 +446,13 @@ const processCounty3CsvData = (csvData) => {
 const cleanTractGeoJson = (geoJson) => {
   geoJson.features.forEach(feature => {
     feature.properties.COUNTYFP = feature.properties.COUNTYFP.replace(/^0+/, '');
+    feature.properties.TRACTCE = feature.properties.TRACTCE.replace(/^0+/, '');
+  });
+  return geoJson;
+};
+
+const cleanTract2GeoJson = (geoJson) => {
+  geoJson.features.forEach(feature => {
     feature.properties.TRACTCE = feature.properties.TRACTCE.replace(/^0+/, '');
   });
   return geoJson;
@@ -512,6 +537,17 @@ const mergeTractData = (geoJson, csvData) => {
   return geoJson.features.map(feature => {
     const matchingCsvData = csvData.find(row => row.county === feature.properties.COUNTYFP && row.tracta === feature.properties.TRACTCE);
 
+    if (matchingCsvData) {
+      console.log('Tract Match:', matchingCsvData, feature);
+      feature.properties.percentage = matchingCsvData.percentage;
+    }
+    return feature;
+  });
+};
+
+const mergeTract2Data = (geoJson, csvData) => {
+  return geoJson.features.map(feature => {
+    const matchingCsvData = csvData.find(row => row.tracta === feature.properties.TRACTCE);
     if (matchingCsvData) {
       console.log('Tract Match:', matchingCsvData, feature);
       feature.properties.percentage = matchingCsvData.percentage;

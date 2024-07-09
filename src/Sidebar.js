@@ -175,7 +175,7 @@ const Sidebar = ({ onGeographyChange, onVariableChange, onAgeChange, onSexChange
               ) : selectedEstimate === 'Dhanawithedu' ? (
                 [
                   <MenuItem key="puma" value="puma">PUMA</MenuItem>,
-                  <MenuItem key="tract" value="tract">Tract</MenuItem>
+                  <MenuItem key="tract2" value="tract2">Tract</MenuItem>
                 ]
               ) : selectedEstimate === 'Dhanawithoutedu' ? (
                 [
