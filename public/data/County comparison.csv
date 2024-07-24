@@ -1,17 +1,17 @@
-﻿County,GEOID,MaineCDCBRFSS direct estimates , Dhana,MH Alzheimer Disease Claims percentage
-"Androscoggin County, ME",1,9.1,10.1,31.5748638
-"Aroostook County, ME",3,10.8,10.7,12.55503195
-"Cumberland County, ME",5,8.6,10.3,24.86088309
-"Franklin County, ME",7,10.4,9.6,13.86442286
-"Hancock County, ME",9,9.5,9.8,10.846872
-"Kennebec County, ME",11,11,10.1,23.57143031
-"Knox County, ME",13,6.7,10.1,33.22251
-"Lincoln County, ME",15,9.4,10,14.71062706
-"Oxford County, ME",17,10.9,9.9,15.95504149
-"Penobscot County, ME",19,11.8,10.1,19.31247243
-"Piscataquis County, ME",21,9.7,9.7,11.64528783
-"Sagadahoc County, ME",23,11.2,10.2,13.90709721
-"Somerset County, ME",25,9.3,9.5,17.79183398
-"Waldo County, ME",27,10.2,9.1,13.17205125
-"Washington County, ME",29,12.6,9.6,31.43408
-"York County, ME",31,9,10.1,20.78585604
+﻿County,GEOID, Dhana,Dhana_withedu,MH Alzheimer Disease Claims percentage,Alzheimer Disease and Non Alzheimer Dementia Individuals percentage,MaineCDCBRFSS direct estimates ,MECDCBRFSS hbsae,MECDCBRFSS hbsae_county_fixed_effect ,Standard error (%),Total weight 65+ (20),Total sample 65+ (20),Total answers 65+ (20),Total Pop all age (20),Total count all age (20),MaineCDCBRFSS direct estimates 20_22
+"Androscoggin County, ME",1,10.1,9.7,31.5748638,7.9,9.1,9.4,9.4,2.9,17963.605,254,252,85258.23587,636,9.447345755
+"Aroostook County, ME",3,10.7,9.8,12.55503195,7.6,10.8,6,6,3,15986.316,262,260,54460.00768,633,10.15339833
+"Cumberland County, ME",5,10.3,8.1,24.86088309,7.3,8.6,11,11,3.4,52080.35,414,412,243394.558,1133,8.743690552
+"Franklin County, ME",7,9.6,8.3,13.86442286,5.7,10.4,10.8,10.8,3.2,6706.757,301,301,25062.98082,624,10.99506205
+"Hancock County, ME",9,9.8,8.4,10.846872,5.1,9.5,7.6,7.6,2.1,13032.625,298,298,45909.23412,676,9.237727986
+"Kennebec County, ME",11,10.1,9,23.57143031,7.9,11,8.9,8.9,2.8,23661.978,292,292,99460.34398,706,11.99896768
+"Knox County, ME",13,10.1,8.1,33.22251,6.2,6.7,6.5,6.4,1.9,9487.763,363,362,32921.48695,738,8.017526464
+"Lincoln County, ME",15,10,7.8,14.71062706,5.7,9.4,6.2,6.2,1.7,9515.568,337,336,29125.01771,664,9.655875554
+"Oxford County, ME",17,9.9,8.2,15.95504149,6.3,10.9,9.4,9.4,6.4,11716.543,245,242,47750.85334,602,10.86572536
+"Penobscot County, ME",19,10.1,8.4,19.31247243,6.9,11.8,12.2,12.3,3.7,27723.746,308,307,124983.1086,845,11.16891595
+"Piscataquis County, ME",21,9.7,8,11.64528783,6.3,9.7,7.2,7.2,2.3,4461.199,256,254,13978.53227,529,9.823702013
+"Sagadahoc County, ME",23,10.2,8.2,13.90709721,6.4,11.2,11.4,11.4,3.7,7536.446,156,156,29293.85507,376,10.22021828
+"Somerset County, ME",25,9.5,8.9,17.79183398,6.9,9.3,9.1,9.1,3.1,10522.003,270,270,41105.30957,633,9.661792384
+"Waldo County, ME",27,9.1,7.5,13.17205125,4.8,10.2,8.5,8.5,2.7,8757.562,312,311,32693.89086,695,10.78788553
+"Washington County, ME",29,9.6,8.5,31.43408,9.7,12.6,9.6,9.6,3.2,7324.422,285,285,25416.11413,629,12.85828765
+"York County, ME",31,10.1,8.4,20.78585604,6.4,9,7,7,2.3,40564.348,340,337,171803.3106,899,8.416454279

@@ -61,19 +61,19 @@ const MapComponent = ({ geography, variable, age, sex, race, education, year }) 
         } else if (variable === 'DirectEstimates') {
           if (geography === 'zipcode') {
             geoJsonPath = '/data/Maine_ZCTAs.geojson';
-            csvPath = '/data/zipcode_maine_alzheimers_direct_estimates.csv';
+            csvPath = '/data/zipcode_maine_alzheimers_direct_estimates2.csv';
             mergeKey = 'ZCTA5CE10';
           } else if (geography === 'county1') {
             geoJsonPath = '/data/modified_county_maine.geojson';
-            csvPath = (age || sex || race || education) ? '/data/me21_county_binary_percentage.csv' : '/data/county_maine_direct_estimates.csv';
+            csvPath = (age || sex || race || education) ? '/data/me21_county_binary_percentage.csv' : '/data/Maine_County_Level_Alzheimer_direct_estimates2.csv';
             mergeKey = (age || sex || race || education) ? 'IMPCTY' : 'GEOID';
           } else if (geography === 'district') {
             geoJsonPath = '/data/Maine_district.geojson';
-            csvPath = '/data/district_maine_alzheimers_direct_estimates.csv';
+            csvPath = '/data/district_maine_alzheimers_direct_estimates2.csv';
             mergeKey = 'District';
           } else if (geography === 'urbanRural') {
             geoJsonPath = '/data/maine_urbnrrl.geojson';
-            csvPath = '/data/maine_urbnrrl.csv';
+            csvPath = '/data/maine_urbnrrl2.csv';
             mergeKey = 'URBNRRL';
           }
         } else if (variable === 'Claims') {
