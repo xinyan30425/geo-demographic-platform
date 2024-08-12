@@ -21,15 +21,19 @@ const MapComponent = () => {
   const fetchDataFromAPI = async () => {
     try {
       const query = new URLSearchParams(filters).toString();
-      //const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
+  
+      const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
 
-      const url = `/geodemo/data?${query}`;
+      // const url = `/geodemo/data?${query}`;
 
       //const url = `https://208bddka5j.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//http
+
+      // const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
 
       console.log("Fetching data from:", url);
 
       const response = await fetch(url, {
+        mode: 'no-cors',
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
