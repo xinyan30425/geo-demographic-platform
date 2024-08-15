@@ -1,118 +1,55 @@
+// MapComponent.js
+
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
 import Legend from './Legend';
 
-const MapComponent = () => {
+const MapComponent = ({ variable, geography }) => {
   const [geoData, setGeoData] = useState(null);
   const [mergedGeoData, setMergedGeoData] = useState(null);
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [filters, setFilters] = useState({
-    table: 'alzheimer_data',
-    geoid: '',
-    sex: '',
-    race: '',
-    education: '',
-    ageg: ''
-  });
-
-  const fetchDataFromAPI = async () => {
-    try {
-      const query = new URLSearchParams(filters).toString();
-  
-      const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
-
-      // const url = `/geodemo/data?${query}`;
-
-      //const url = `https://208bddka5j.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//http
-
-      // const url = `https://kvrewjpbq9.execute-api.us-east-1.amazonaws.com/geodemo/data?${query}`;//restapi
-
-      console.log("Fetching data from:", url);
-
-      const response = await fetch(url, {
-        mode: 'no-cors',
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            //'x-api-key': 'Kv8nUmrKv55mCpkRCNb3E9xq4TygMGuhabXdpDSd' // Replace with your actual API Key
-        },
-    });
-
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(`HTTP error! Status: ${response.status}, Message: ${message}`);
-      }
-
-      const data = await response.json();
-      console.log("Data fetched from API:", data);
-      return data;
-    } catch (error) {
-      console.error("Error fetching data from API:", error);
-      throw error;
-    }
-  };
-
- 
-
-  const fetchGeoJSON = async () => {
-    const geoJsonResponse = await fetch('/data/puma_newengland.geojson'); 
-    if (!geoJsonResponse.ok) throw new Error('Failed to fetch GeoJSON data');
-    const geoJson = await geoJsonResponse.json();
-    return geoJson;
-  };
-
-  const mergeData = (geoJson, apiData) => {
-    const mergedData = geoJson.features.map(feature => {
-      const matchingApiData = apiData.find(row => row.geoid === feature.properties.GEOID10);
-      if (matchingApiData) {
-        feature.properties.alzheimer_prob = matchingApiData.alzheimer_prob;
-      }
-      return feature;
-    });
-    return { ...geoJson, features: mergedData };
-  };
-
-  const fetchAndMergeData = async () => {
-    try {
-      const geoJson = await fetchGeoJSON();
-      const apiData = await fetchDataFromAPI();
-      const mergedData = mergeData(geoJson, apiData);
-
-      setGeoData(geoJson);
-      setMergedGeoData(mergedData);
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
-  };
 
   useEffect(() => {
-    fetchAndMergeData();
-  }, [filters]);
+    const fetchData = async () => {
+      try {
+        // Fetch GeoJSON data from the backend
+        const geoJsonResponse = await fetch('http://localhost:3001/geojson');
+        if (!geoJsonResponse.ok) throw new Error('Failed to fetch GeoJSON data');
+        const geoJson = await geoJsonResponse.json();
+        setGeoData(geoJson);
+
+        // Fetch CSV data from the backend
+        const csvResponse = await fetch('http://localhost:3001/csvdata');
+        if (!csvResponse.ok) throw new Error('Failed to fetch CSV data');
+        const csvData = await csvResponse.json();
+
+        // Merge CSV data with GeoJSON data
+        const mergedData = geoJson.features.map(feature => {
+          const matchingCsvData = csvData.find(row => row.geoid === feature.properties.GEOID10);
+          if (matchingCsvData) {
+            feature.properties.percentage = matchingCsvData.percentage;
+          }
+          return feature;
+        });
+        setMergedGeoData({ ...geoJson, features: mergedData });
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    fetchData();
+  }, [variable, geography]);
 
   useEffect(() => {
     console.log("cursorPosition.x", cursorPosition.x);
     console.log("cursorPosition.y", cursorPosition.y);
   }, [cursorPosition]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetchAndMergeData();
-  };
-
   const styleFeature = feature => {
     return {
-      fillColor: getColor(feature.properties.alzheimer_prob),
+      fillColor: getColor(feature.properties.percentage),
       weight: 2,
       opacity: 1,
       color: 'white',
@@ -123,12 +60,12 @@ const MapComponent = () => {
 
   const getColor = d => {
     return d > 10.5 ? '#800026' :
-           d > 10 ? '#BD0026' :
-           d > 9.5 ? '#E31A1C' :
-           d > 9 ? '#FC4E2A' :
-           d > 8.5 ? '#FD8D3C' :
-           d > 8 ? '#FEB24C' :
-                    '#FFEDA0';
+      d > 10 ? '#BD0026' :
+        d > 9.5 ? '#E31A1C' :
+          d > 9 ? '#FC4E2A' :
+            d > 8.5 ? '#FD8D3C' :
+              d > 8 ? '#FEB24C' :
+                '#FFEDA0';
   };
 
   const onEachFeature = (feature, layer) => {
@@ -137,16 +74,17 @@ const MapComponent = () => {
         const map = e.target._map;
         const { lat, lng } = e.latlng;
         const point = map.latLngToContainerPoint([lat, lng]);
-        const panelWidth = 100;
-        const panelHeight = 100;
-
+        const panelWidth = 100; // Width of the info panel
+        const panelHeight = 100; // Height of the info panel
         let panelX = point.x;
         let panelY = point.y;
 
+        // Get container dimensions
         const container = map.getContainer();
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
 
+        // Adjust position to prevent overflow
         if (panelX + panelWidth > containerWidth) {
           panelX = containerWidth - panelWidth;
         }
@@ -154,6 +92,7 @@ const MapComponent = () => {
           panelY = containerHeight - panelHeight;
         }
 
+        // Ensure the panel doesn't go off the screen
         if (panelX < 0) {
           panelX = 0;
         }
@@ -178,19 +117,6 @@ const MapComponent = () => {
 
   return (
     <div className="map-container">
-      <form onSubmit={handleSubmit} className="filter-form">
-        <select name="table" onChange={handleInputChange}>
-          <option value="alzheimer_data">Alzheimer Data</option>
-          <option value="demographic_data">Demographic Data</option>
-        </select>
-        <input type="text" name="geoid" placeholder="GEOID" onChange={handleInputChange} />
-        <input type="text" name="sex" placeholder="Sex" onChange={handleInputChange} />
-        <input type="text" name="race" placeholder="Race" onChange={handleInputChange} />
-        <input type="text" name="education" placeholder="Education" onChange={handleInputChange} />
-        <input type="text" name="ageg" placeholder="Age Group" onChange={handleInputChange} />
-        <button type="submit">Fetch Data</button>
-      </form>
-
       <MapContainer
         bounds={bounds}
         minZoom={4}
@@ -205,20 +131,18 @@ const MapComponent = () => {
         <GeoJSON data={mergedGeoData} style={styleFeature} onEachFeature={onEachFeature} />
         <Legend />
       </MapContainer>
-
       {selectedFeature && (
-        <div 
-          className="info-panel" 
-          style={{ 
-            top: cursorPosition.y, 
-            left: cursorPosition.x, 
+        <div
+          className="info-panel"
+          style={{
+            top: cursorPosition.y,
+            left: cursorPosition.x,
             position: 'absolute',
             transform: 'translate(-50%, -100%)'
           }}
         >
-          <p>GEOID: {selectedFeature.GEOID || 'N/A'}</p>
-          <p>PUMA: {selectedFeature.GEOID10 || 'N/A'}</p>
-          <p>Alzheimer's Incidence Rate: {selectedFeature.alzheimer_prob ? `${selectedFeature.alzheimer_prob}%` : 'N/A'}</p>
+          <p>GEOID: {selectedFeature.GEOID10 || 'N/A'}</p>
+          <p>Alzheimer's Incidence Rate: {selectedFeature.percentage ? `${selectedFeature.percentage}%` : 'N/A'}</p>
         </div>
       )}
     </div>
